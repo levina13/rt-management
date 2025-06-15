@@ -2,14 +2,15 @@ import { createBrowserRouter } from "react-router-dom"
 import Dashboard from "./pages/Dashboard"
 import Payment from "./pages/Payment"
 import Expense from "./pages/Expense"
-import ResidentManagement from "./pages/ResidentManagement"
-import HouseManagement from "./pages/HouseManagement"
+import ResidentManagement from "./pages/management/ResidentManagement"
+import HouseManagement from "./pages/management/HouseManagement"
+import ResidentHistory from "./pages/house-detail/ResidentHistory"
+import PaymentHistory from "./pages/house-detail/PaymentHistory"
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Dashboard />,
-    // children: [{ path: "/house-management", element: <HouseManagement /> }],
   },
   {
     path: "/payment",
@@ -26,6 +27,15 @@ const router = createBrowserRouter([
   {
     path: "/house-management",
     element: <HouseManagement />,
+    children: [],
+  },
+  {
+    path: "/house-management/:houseNumber/resident-history",
+    element: <ResidentHistory />,
+  },
+  {
+    path: "/house-management/:houseNumber/payment-history",
+    element: <PaymentHistory />,
   },
 ])
 

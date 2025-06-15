@@ -1,5 +1,4 @@
-import ExpenseForm from "@/components/forms/expense-form"
-import { ImageModal } from "@/components/image-modal"
+import ContractForm from "@/components/forms/contract-form"
 import Layout from "@/components/Layout"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -12,59 +11,61 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit, PlusSquare } from "lucide-react"
+import { Edit, MessageCircleMore, PlusSquare } from "lucide-react"
 
-export default function Expense() {
+export default function ResidentHistory() {
   return (
     <>
       <Layout>
         <div className="container">
           <div className="text-center flex items-center text-3xl font-bold">
-            <p>Manajemen Pengeluaran</p>
+            <p>History Penghuni Rumah ...</p>
           </div>
           <div className="mt-5 flex flex-row-reverse">
             <div className="flex flex-row-reverse">
-              <ExpenseForm>
+              <ContractForm>
                 <Button variant={"default"}>
-                  <PlusSquare /> Tambah Pengeluaran
+                  <PlusSquare /> Tambah Penghuni
                 </Button>
-              </ExpenseForm>
+              </ContractForm>
             </div>
           </div>
           <div>
             <Table>
-              <TableCaption>Daftar Pengeluaran di RT..</TableCaption>
+              <TableCaption>Daftar penghuni rumah ...</TableCaption>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[30px]">No.</TableHead>
-                  <TableHead>Jenis Pengeluaran</TableHead>
-                  <TableHead>Deskripsi</TableHead>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Jumlah</TableHead>
+                  <TableHead>Nama</TableHead>
+                  <TableHead>Status </TableHead>
+                  <TableHead>Tanggal Mulai</TableHead>
+                  <TableHead>Tanggal Berakhir</TableHead>
                   <TableHead className="text-center">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 <TableRow>
                   <TableCell className="font-medium">1</TableCell>
-                  <TableCell>
-                    <Badge>Satpam</Badge>
-                    <Badge>Lainnya</Badge>
+                  <TableCell>Arjuna</TableCell>
+                  <TableCell className="">
+                    <div className="flex flex-col">
+                      <Badge>Kontrak</Badge>
+                      <Badge variant={"secondary"}>Tetap</Badge>
+                      <Badge variant={"destructive"}>Tidak Aktif</Badge>
+                    </div>
                   </TableCell>
-                  <TableCell>Satpam Januari 2020</TableCell>
-                  <TableCell>5 Januari 2025</TableCell>
-                  <TableCell>500.000</TableCell>
-
+                  <TableCell>20 Oktober 2020</TableCell>
+                  <TableCell>20 Oktober 2025</TableCell>
                   <TableCell className="">
                     <div className="flex justify-center gap-2">
-                      <ImageModal url="..." alt="...">
-                        <Button variant={"outline"}>Bukti</Button>
-                      </ImageModal>
-                      <ExpenseForm>
+                      <ContractForm>
                         <Button variant={"default"}>
                           <Edit /> Edit
                         </Button>
-                      </ExpenseForm>
+                      </ContractForm>
+                      <Button variant={"secondary"}>
+                        <MessageCircleMore /> Chat
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>

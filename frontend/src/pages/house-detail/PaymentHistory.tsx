@@ -1,6 +1,5 @@
-import ExpenseForm from "@/components/forms/expense-form"
-import { ImageModal } from "@/components/image-modal"
 import Layout from "@/components/Layout"
+import PaymentForm from "@/components/forms/payment-form"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,59 +11,55 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit, PlusSquare } from "lucide-react"
+import { MessageCircleMore, PlusSquare } from "lucide-react"
 
-export default function Expense() {
+export default function PaymentHistory() {
   return (
     <>
       <Layout>
         <div className="container">
           <div className="text-center flex items-center text-3xl font-bold">
-            <p>Manajemen Pengeluaran</p>
+            <p>History Pembayaran Rumah ...</p>
           </div>
           <div className="mt-5 flex flex-row-reverse">
             <div className="flex flex-row-reverse">
-              <ExpenseForm>
+              <PaymentForm>
                 <Button variant={"default"}>
-                  <PlusSquare /> Tambah Pengeluaran
+                  <PlusSquare /> Tambah Pembayaran
                 </Button>
-              </ExpenseForm>
+              </PaymentForm>
             </div>
           </div>
           <div>
             <Table>
-              <TableCaption>Daftar Pengeluaran di RT..</TableCaption>
+              <TableCaption>Daftar pembayaran rumah ...</TableCaption>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[30px]">No.</TableHead>
-                  <TableHead>Jenis Pengeluaran</TableHead>
-                  <TableHead>Deskripsi</TableHead>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Jumlah</TableHead>
+                  <TableHead>Penghuni</TableHead>
+                  <TableHead>Periode</TableHead>
+                  <TableHead>Jenis Iuran </TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Tanggal Pembayaran</TableHead>
                   <TableHead className="text-center">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 <TableRow>
                   <TableCell className="font-medium">1</TableCell>
+                  <TableCell>Arjuna</TableCell>
+                  <TableCell>Januari 2025</TableCell>
+                  <TableCell className="">Iuran Kebersihan</TableCell>
                   <TableCell>
-                    <Badge>Satpam</Badge>
-                    <Badge>Lainnya</Badge>
+                    <Badge>Lunas</Badge>
+                    <Badge variant={"destructive"}>Belum Bayar</Badge>
                   </TableCell>
-                  <TableCell>Satpam Januari 2020</TableCell>
-                  <TableCell>5 Januari 2025</TableCell>
-                  <TableCell>500.000</TableCell>
-
+                  <TableCell>20 Oktober 2025</TableCell>
                   <TableCell className="">
                     <div className="flex justify-center gap-2">
-                      <ImageModal url="..." alt="...">
-                        <Button variant={"outline"}>Bukti</Button>
-                      </ImageModal>
-                      <ExpenseForm>
-                        <Button variant={"default"}>
-                          <Edit /> Edit
-                        </Button>
-                      </ExpenseForm>
+                      <Button variant={"secondary"}>
+                        <MessageCircleMore /> Chat
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>

@@ -19,22 +19,22 @@ const items = [
     icon: LayoutDashboard,
   },
   {
-    title: "Payments",
+    title: "Iuran",
     url: "/payment",
     icon: CreditCard,
   },
   {
-    title: "Expenses",
+    title: "Pengeluaran",
     url: "/expense",
     icon: Wallet,
   },
   {
-    title: "Residents",
+    title: "Penghuni",
     url: "/resident-management",
     icon: Users,
   },
   {
-    title: "Houses",
+    title: "Rumah",
     url: "/house-management",
     icon: Home,
   },

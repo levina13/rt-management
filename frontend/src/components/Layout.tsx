@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Navbar />
       <SidebarProvider>
         <AppSidebar />
-        <main className="mt-20">{children}</main>
+        <main className="mt-25 container md:px-10 py-10">{children}</main>
       </SidebarProvider>
     </>
   )
