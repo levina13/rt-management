@@ -2,23 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Models\House;
+use App\Models\FeeCategory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class HouseSeeder extends Seeder
+class FeeCategorySeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $houses = [];
-
-        foreach (range(1, 20) as $i) {
-            House::create([
-                'house_num' => "R{$i}",
-            ]);
-        }
+        FeeCategory::create(['nama' => 'Satpam', 'amount' => 100000]);
+        FeeCategory::create(['nama' => 'Kebersihan', 'amount' => 15000]);
     }
 }
