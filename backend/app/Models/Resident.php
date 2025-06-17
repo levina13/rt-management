@@ -12,4 +12,8 @@ class Resident extends Model
     {
         return $this->hasMany(Contract::class);
     }
+    public function currentContract()
+    {
+        return $this->hasOne(Contract::class)->active();
+    }
 }

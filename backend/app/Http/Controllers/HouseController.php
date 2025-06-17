@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Contract;
 use App\Models\House;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,9 @@ class HouseController extends Controller
      */
     public function index()
     {
-        $houses = House::get();
+        $houses = House::all();
+
+
         return response()->json($houses);
     }
 
@@ -21,11 +24,12 @@ class HouseController extends Controller
      */
     public function store(Request $request)
     {
-        $house = new House();
-        $house->name = $request->name;
-        $house->description = $request->description;
-        $house->save();
-        return response()->json($house);
+        $data = $request->validate([
+            'house_num' => 'required|string|max:10',
+        ]);
+
+        $house = House::create($data);
+        return response()->json($house, 201);
     }
 
     /**
@@ -42,10 +46,14 @@ class HouseController extends Controller
      */
     public function update(Request $request, string $id)
     {
+
+        $data = $request->validate([
+            'house_num' => 'required|string|max:10',
+        ]);
+
         $house = House::find($id);
-        $house->name = $request->name;
-        $house->description = $request->description;
-        $house->save();
+        $house->update($data);
+
         return response()->json($house);
     }
 

@@ -1,15 +1,23 @@
 import type React from "react"
-import { SidebarProvider } from "./ui/sidebar"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "./ui/sidebar"
 import { AppSidebar } from "./app-sidebar"
-import Navbar from "./nav-bar"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Navbar />
-      <SidebarProvider>
+      <SidebarProvider
+        style={
+          {
+            "--sidebar-width": "calc(var(--spacing) * 72)",
+            "--header-height": "calc(var(--spacing) * 12)",
+          } as React.CSSProperties
+        }
+      >
         <AppSidebar />
-        <main className="mt-25 container md:px-10 py-10">{children}</main>
+        <SidebarInset>
+          <SidebarTrigger className="p-5 m-5" variant={"default"} />
+          <main className=" container md:px-10">{children}</main>
+        </SidebarInset>
       </SidebarProvider>
     </>
   )

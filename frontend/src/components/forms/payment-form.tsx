@@ -1,9 +1,8 @@
 import { DialogTrigger } from "@radix-ui/react-dialog"
 import { Dialog, DialogContent, DialogHeader } from "../ui/dialog"
 import { Button } from "../ui/button"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Label } from "../ui/label"
-import { Input } from "../ui/input"
 import {
   Select,
   SelectContent,
@@ -13,123 +12,156 @@ import {
 } from "../ui/select"
 import { ScrollArea } from "../ui/scroll-area"
 import { Scrollbar } from "@radix-ui/react-scroll-area"
-import { Separator } from "../ui/separator"
-import { MonthCheckbox } from "../month-checkbox"
-import { DatePicker } from "../date-picker"
+import { api } from "@/lib/axios"
+import { FeeCategory, type House } from "@/pages/management/type"
 
 export default function PaymentForm({
   children,
-}: {
+  onSuccess,
+}: // id,
+{
   children: React.ReactNode
+  onSuccess?: () => void
+  // id?: number
 }) {
-  const [form, setForm] = useState({
-    house_number: "",
-    resident: "",
+  const initialForm = {
+    house_id: "",
     fee_category: "",
-    payment_date: "no",
-    year: "",
-    months: ["january"] as string[],
-  })
+    fee_count: "",
+  }
+  const [form, setForm] = useState(initialForm)
+  const [open, setOpen] = useState(false)
+  const [maxMonths, setMaxMonths] = useState(0)
+  const [houses, setHouses] = useState<House[]>([])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+  // Fetch rumah (yang tidak kosong)
+  useEffect(() => {
+    api.get("/houses").then((res) => setHouses(res.data))
+    // api.get("/fee-categories").then((res) => setFeeCategories(res.data))
+  }, [])
+
+  useEffect(() => {
+    if (form.house_id && form.fee_category) {
+      api
+        .get(`/fees/max-months/${form.house_id}/${form.fee_category}`, {
+          params: { category_id: form.fee_category },
+        })
+        .then((res) => {
+          setMaxMonths(res.data.max_months)
+          setForm((prev) => ({
+            ...prev,
+            months: Math.min(
+              parseInt(prev.fee_count),
+              res.data.max_months || 0
+            ),
+          }))
+          console.log(res.data.max_months)
+        })
+    }
+  }, [form.house_id, form.fee_category])
+
+  const handleHouseChange = (value: string) => {
+    setForm({ ...form, house_id: value })
   }
 
   const handleFeeCategoryChange = (value: string) => {
     setForm({ ...form, fee_category: value })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFeeCountChange = (value: string) => {
+    setForm({ ...form, fee_count: value })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form Submitted:", form)
-    // POST ke API di sini kalau backend sudah siap
+
+    try {
+      const payload = {
+        house_id: parseInt(form.house_id),
+        fee_category: form.fee_category,
+        fee_count: parseInt(form.fee_count),
+      }
+      console.log(payload)
+
+      await api.post("/fees", payload)
+
+      onSuccess?.()
+      setOpen(false)
+    } catch (err) {
+      console.error("Submit failed", err)
+    }
   }
   return (
     <>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{children}</DialogTrigger>
         <DialogContent className="md:max-w-[70vw] max-h-[80vh] w-fit ">
           <DialogHeader className="text-center items-center mb-3">
             <div className="text-2xl font-bold">Konfirmasi Pembayaran</div>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh] ">
-            <form onSubmit={handleSubmit} className="space-y-4 m-5">
-              <div className="flex flex-col  md:grid md:grid-cols-2 gap-1 md:gap-x-4">
-                <div className="flex flex-col gap-2 w-full max-w-full">
-                  <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="houseNum">Nomor Rumah</Label>
-                    <Input
-                      id="houseNum"
-                      name="houseNum"
-                      value={form.house_number}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="name">Pembayar</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={form.resident}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="status">Jenis Iuran</Label>
-                    <Select
-                      value={form.fee_category}
-                      onValueChange={handleFeeCategoryChange}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Pilih iuran" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="no">Kebersihan</SelectItem>
-                        <SelectItem value="yes">Satpam</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="Date">Tanggal Pembayaran</Label>
-                    <DatePicker />
-                  </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-2 w-full max-w-full">
+                <div className="grid w-full max-w-sm items-center gap-3">
+                  <Label>Rumah</Label>
+                  <Select
+                    value={form.house_id}
+                    onValueChange={handleHouseChange}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih rumah" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {houses.map((h) => (
+                        <SelectItem key={h.id} value={String(h.id)}>
+                          {h.house_num}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <Separator className="md:hidden mt-2" />
-                <div className="flex flex-col gap-2">
-                  <div className="text-lg font-bold">Periode Iuran</div>
-                  <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="year">Tahun</Label>
-                    <Select
-                      value={form.year}
-                      onValueChange={handleFeeCategoryChange}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Pilih Tahun" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="2020">2020</SelectItem>
-                        <SelectItem value="2022">2022</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="endDate">Bulan</Label>
-                    <MonthCheckbox
-                      selectedMonths={form.months}
-                      onChange={(months) =>
-                        setForm((prev) => ({ ...prev, months }))
-                      }
-                    />
-                  </div>
+                <div className="grid w-full max-w-sm items-center gap-3">
+                  <Label>Jenis Iuran</Label>
+                  <Select
+                    value={form.fee_category}
+                    onValueChange={handleFeeCategoryChange}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih iuran" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FeeCategory.map((f) => (
+                        <SelectItem key={f} value={String(f)}>
+                          {f}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid w-full max-w-sm items-center gap-3">
+                  <Label>Jumlah Bulan</Label>
+                  <Select
+                    value={form.fee_count}
+                    onValueChange={handleFeeCountChange}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih jumlah iuran" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: maxMonths + 1 }, (_, i) => (
+                        <SelectItem key={i} value={String(i)}>
+                          {i} bulan
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
+            </div>
 
-              <Button type="submit" className="w-full">
-                Simpan
-              </Button>
-            </form>
+            <Button onClick={handleSubmit} className="w-full">
+              Simpan
+            </Button>
             <Scrollbar />
           </ScrollArea>
         </DialogContent>

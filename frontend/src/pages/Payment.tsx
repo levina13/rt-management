@@ -1,6 +1,5 @@
 import PaymentForm from "@/components/forms/payment-form"
 import Layout from "@/components/Layout"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -11,10 +10,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { MessageCircleMore, PlusSquare } from "lucide-react"
-import React from "react"
+import { api } from "@/lib/axios"
+import { MessageCircleMoreIcon, PlusSquare } from "lucide-react"
+import React, { useEffect, useState } from "react"
+import type { FeeHistoryTable } from "./management/type"
 
 export default function Payment() {
+  const [fees, setfees] = useState([])
+  function fetchFees() {
+    api
+      .get("/fee-history-table")
+      .then((res) => setfees(res.data))
+      .catch((err) => console.error(err))
+  }
+  useEffect(() => {
+    fetchFees()
+  }, [])
   return (
     <Layout>
       <div className="container">
@@ -22,9 +33,8 @@ export default function Payment() {
           <p>Histori Iuran</p>
         </div>
         <div className="mt-5 flex flex-row-reverse flex-between">
-          {/* <div></div> */}
           <div className="flex flex-row-reverse">
-            <PaymentForm>
+            <PaymentForm onSuccess={fetchFees}>
               <Button variant={"default"}>
                 <PlusSquare /> Tambah Pembayaran
               </Button>
@@ -40,37 +50,42 @@ export default function Payment() {
                 <TableHead>Rumah</TableHead>
                 <TableHead>Pembayar</TableHead>
                 <TableHead>Jenis Iuran </TableHead>
-                <TableHead>Status</TableHead>
+                {/* <TableHead>Status</TableHead> */}
                 <TableHead>Periode</TableHead>
-                <TableHead>Tanggal</TableHead>
-                <TableHead className="text-center">Aksi</TableHead>
+                <TableHead>Tanggal Pembayaran</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">1</TableCell>
-                <TableCell>A-02</TableCell>
-                <TableCell>Arjuna5</TableCell>
-                <TableCell className="">Iuran Kebersihan</TableCell>
-                <TableCell>
+              {fees.map((fee: FeeHistoryTable, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">{index + 1}</TableCell>
+                  <TableCell>{fee.house_num}</TableCell>
+                  <TableCell>
+                    <div className="flex justify-between">
+                      <div>{fee.resident_name}</div>
+                      <div>
+                        <Button variant={"outline"} asChild>
+                          <a
+                            href={`https://wa.me/62${fee.resident_phone.substring(
+                              1
+                            )}`}
+                            target="blank"
+                          >
+                            <MessageCircleMoreIcon />
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="">{fee.fee_category}</TableCell>
+                  {/* <TableCell>
                   <Badge>Lunas</Badge>
                   <Badge variant={"destructive"}>Belum Bayar</Badge>
-                </TableCell>
-                <TableCell>Oktober 2025</TableCell>
-                <TableCell>20 Oktober 2025</TableCell>
-                <TableCell className="">
-                  <div className="flex justify-center gap-2">
-                    <Button variant={"default"}>
-                      <MessageCircleMore /> Chat
-                    </Button>
-                    <PaymentForm>
-                      <Button variant={"outline"}>
-                        <MessageCircleMore /> Konfirmasi Pembayaran
-                      </Button>
-                    </PaymentForm>
-                  </div>
-                </TableCell>
-              </TableRow>
+                </TableCell> */}
+                  <TableCell>{fee.periode}</TableCell>
+                  <TableCell>{fee.paid_at}</TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>

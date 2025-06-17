@@ -1,7 +1,7 @@
 import { DialogTrigger } from "@radix-ui/react-dialog"
 import { Dialog, DialogContent, DialogHeader } from "../ui/dialog"
 import { Button } from "../ui/button"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Label } from "../ui/label"
 import { Input } from "../ui/input"
 import {
@@ -13,99 +13,164 @@ import {
 } from "../ui/select"
 import { ScrollArea } from "../ui/scroll-area"
 import { Scrollbar } from "@radix-ui/react-scroll-area"
+import { api } from "@/lib/axios"
 
 export default function ResidentForm({
   children,
+  onSuccess,
+  id,
 }: {
   children: React.ReactNode
+  onSuccess?: () => void
+  id?: number
 }) {
-  const [form, setForm] = useState({
+  const isEditing = !!id
+
+  const initialForm = {
     name: "",
     phone: "",
-    isMarried: "no",
+    is_married: "0",
     ktp: "",
-    houseNumber: "",
-    startDate: "",
-    endDate: "",
-  })
+  }
+  const [form, setForm] = useState(initialForm)
+  const [open, setOpen] = useState(false)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  useEffect(() => {
+    if (isEditing && open) {
+      api
+        .get(`/residents/${id}`)
+        .then((res) => {
+          const data = res.data
+          setForm({
+            ...data,
+            is_married: String(data.is_married),
+          })
+          setImagePreview(data.ktp_url)
+        })
+        .catch((err) => console.error("Failed to fetch resident", err))
+    } else if (!isEditing) {
+      setForm(initialForm)
+    }
+  }, [id, open])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleMarriedChange = (value: string) => {
-    setForm({ ...form, isMarried: value })
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setImageFile(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Form Submitted:", form)
-    // POST ke API di sini kalau backend sudah siap
+  const handleMarriedChange = (value: string) => {
+    setForm({ ...form, is_married: value })
+  }
+
+  const handleSubmit = async () => {
+    let photoUrl = form.ktp
+
+    if (imageFile) {
+      const formData = new FormData()
+      formData.append("image", imageFile)
+      const res = await api.post("/upload-ktp", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      photoUrl = res.data.url
+    }
+
+    const payload = {
+      ...form,
+      ktp: photoUrl,
+      is_married: form.is_married === "1",
+    }
+
+    try {
+      if (isEditing) {
+        await api.put(`/residents/${id}`, payload)
+      } else {
+        await api.post("/residents", payload)
+      }
+      onSuccess?.()
+      setOpen(false)
+    } catch (error) {
+      console.error("Submit failed", error)
+    }
   }
 
   return (
     <>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{children}</DialogTrigger>
         <DialogContent className="md:max-w-[70vw] w-fit max-h-[80vh]">
           <DialogHeader className="text-center items-center mb-3">
-            <div className="text-2xl font-bold">Tambah Warga</div>
+            <div className="text-2xl font-bold">
+              {isEditing ? "Edit" : "Tambah"} Warga
+            </div>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh]">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="flex flex-col">
-                <div className="flex flex-col gap-2 w-full max-w-full">
-                  <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="name">Nama</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      required
+            <div className="flex flex-col">
+              <div className="flex flex-col gap-2 w-full max-w-full">
+                <div className="grid w-full max-w-sm items-center gap-3">
+                  <Label htmlFor="name">Nama</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={form.name}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="grid w-full max-w-sm items-center gap-3">
+                  <Label htmlFor="phone">No. HP</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="grid w-full max-w-sm items-center gap-3">
+                  <Label htmlFor="status">Status Pernikahan</Label>
+                  <Select
+                    value={form.is_married}
+                    onValueChange={handleMarriedChange}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">Single</SelectItem>
+                      <SelectItem value="1">Sudah Menikah</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid w-full max-w-sm items-center gap-3">
+                  <Label htmlFor="ktp">KTP</Label>
+                  <Input
+                    id="ktp"
+                    name="ktp"
+                    type="file"
+                    onChange={handleImageChange}
+                    accept="image/*"
+                  />
+                  {imagePreview && (
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="mt-2 w-32 h-32 object-cover rounded"
                     />
-                  </div>
-                  <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="phone">No. HP</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      value={form.phone}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="status">Status Pernikahan</Label>
-                    <Select
-                      value={form.isMarried}
-                      onValueChange={handleMarriedChange}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Pilih status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="no">Single</SelectItem>
-                        <SelectItem value="yes">Sudah Menikah</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid w-full max-w-sm items-center gap-3">
-                    <Label htmlFor="ktp">KTP</Label>
-                    <Input
-                      id="ktp"
-                      name="ktp"
-                      value={form.ktp}
-                      type="file"
-                      onChange={handleChange}
-                    />
-                  </div>
+                  )}
                 </div>
               </div>
+            </div>
 
-              <Button type="submit" className="w-full">
-                Simpan
-              </Button>
-            </form>
+            <Button onClick={handleSubmit} className="w-full">
+              Simpan
+            </Button>
             <Scrollbar />
           </ScrollArea>
         </DialogContent>

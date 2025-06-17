@@ -12,9 +12,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit, PlusSquare } from "lucide-react"
+import { api } from "@/lib/axios"
+import { Edit, MessageCircleMoreIcon, PlusSquare } from "lucide-react"
+import { useEffect, useState } from "react"
+import type { ResidentTable } from "./type"
 
 export default function ResidentManagement() {
+  const [residents, setResidents] = useState([])
+  function fetchResident() {
+    api
+      .get("/resident-table")
+      .then((res) => setResidents(res.data))
+      .catch((err) => console.error(err))
+  }
+  useEffect(() => {
+    fetchResident()
+  }, [])
   return (
     <Layout>
       <div className="container">
@@ -23,7 +36,7 @@ export default function ResidentManagement() {
         </div>
         <div className="mt-5 flex flex-row-reverse">
           <div className="flex flex-row-reverse">
-            <ResidentForm>
+            <ResidentForm onSuccess={fetchResident}>
               <Button variant={"default"}>
                 <PlusSquare /> Tambah Warga
               </Button>
@@ -47,39 +60,58 @@ export default function ResidentManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">1</TableCell>
-                <TableCell>Arjuna</TableCell>
-                <TableCell>A-2</TableCell>
-                <TableCell>081273644829</TableCell>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <Badge>Sudah Menikah</Badge>
-                    <Badge variant={"destructive"}>Belum Menikah</Badge>
-                  </div>
-                </TableCell>
-                <TableCell className="">
-                  <div className="flex flex-col">
-                    <Badge>Kontrak</Badge>
-                    <Badge variant={"secondary"}>Tetap</Badge>
-                    <Badge variant={"destructive"}>Tidak Aktif</Badge>
-                  </div>
-                </TableCell>
-                <TableCell>20 Oktober 2020</TableCell>
-                <TableCell>20 Oktober 2025</TableCell>
-                <TableCell className="">
-                  <div className="flex justify-center gap-2">
-                    <ImageModal url="..." alt="...">
-                      <Button variant={"secondary"}>KTP</Button>
-                    </ImageModal>
-                    <ResidentForm>
-                      <Button variant={"default"}>
-                        <Edit /> Edit
-                      </Button>
-                    </ResidentForm>
-                  </div>
-                </TableCell>
-              </TableRow>
+              {residents.map((resident: ResidentTable, index) => (
+                <TableRow key={resident.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>
+                    <div className="flex justify-between">
+                      <div>{resident.name}</div>
+                      <div>
+                        <Button variant={"outline"} asChild>
+                          <a
+                            href={`https://wa.me/62${resident.phone.substring(
+                              1
+                            )}`}
+                            target="blank"
+                          >
+                            <MessageCircleMoreIcon />
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{resident.house_num}</TableCell>
+                  <TableCell>{resident.phone}</TableCell>
+                  <TableCell>
+                    {resident.is_married ? (
+                      <Badge>Sudah Menikah</Badge>
+                    ) : (
+                      <Badge variant={"destructive"}>Belum Menikah</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {resident.status == "Tidak Aktif" ? (
+                      <Badge variant={"destructive"}>Tidak Aktif</Badge>
+                    ) : (
+                      <Badge>{resident.status}</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>{resident?.start_date}</TableCell>
+                  <TableCell>{resident?.end_date}</TableCell>
+                  <TableCell className="">
+                    <div className="flex justify-center gap-2">
+                      <ImageModal url={resident.ktp} alt="KTP">
+                        <Button variant={"outline"}>KTP</Button>
+                      </ImageModal>
+                      <ResidentForm id={resident.id} onSuccess={fetchResident}>
+                        <Button variant={"default"}>
+                          <Edit /> Edit
+                        </Button>
+                      </ResidentForm>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>

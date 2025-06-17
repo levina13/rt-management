@@ -24,13 +24,22 @@ class ContractSeeder extends Seeder
             ]);
         }
 
-        foreach (range(16, 20) as $i) {
+        foreach (range(16, 18) as $i) {
             Contract::create([
                 'house_id' => $i,
                 'resident_id' => $i,
                 'contract_category' => 'kontrak',
                 'start_date' => Carbon::now()->subMonth(),
                 'end_date' => Carbon::now()->addMonths(2),
+            ]);
+        }
+        foreach (range(19, 20) as $i) {
+            Contract::create([
+                'house_id' => $i,
+                'resident_id' => $i,
+                'contract_category' => 'kontrak',
+                'start_date' => Carbon::now()->subMonth(2),
+                'end_date' => Carbon::now()->subMonth(1),
             ]);
         }
     }

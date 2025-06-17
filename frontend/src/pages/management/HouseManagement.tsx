@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { api } from "@/lib/axios"
 import {
   Edit,
   MessageCircleMoreIcon,
@@ -18,8 +19,21 @@ import {
   User,
   Wallet,
 } from "lucide-react"
+import { useEffect, useState } from "react"
+import type { HouseTable } from "./type"
 
 export default function HouseManagement() {
+  const [houses, setHouses] = useState([])
+  function fetchHouses() {
+    api
+      .get("/house-table")
+      .then((res) => setHouses(res.data))
+      .catch((err) => console.error(err))
+  }
+  useEffect(() => {
+    fetchHouses()
+  }, [])
+
   return (
     <Layout>
       <div className="container">
@@ -28,7 +42,7 @@ export default function HouseManagement() {
         </div>
         <div className="mt-5 flex flex-row-reverse">
           <div className="flex flex-row-reverse">
-            <HouseForm>
+            <HouseForm onSuccess={fetchHouses}>
               <Button variant={"default"}>
                 <PlusSquare /> Tambah Rumah
               </Button>
@@ -49,52 +63,82 @@ export default function HouseManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">1</TableCell>
-                <TableCell>A-2</TableCell>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <Badge>Dihuni</Badge>
-                    <Badge variant={"destructive"}>Tidak Dihuni</Badge>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  Arjuna{" "}
-                  <Button>
-                    <MessageCircleMoreIcon />
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <Badge>Satpam (lunas)</Badge>
-                    <Badge variant={"destructive"}>Satpam (belum bayar)</Badge>
-                    <Badge>Kebersihan (lunas)</Badge>
-                    <Badge variant={"destructive"}>
-                      Keberishan (belum bayar)
-                    </Badge>
-                  </div>
-                </TableCell>
-                <TableCell className="">
-                  <div className="flex justify-center gap-2">
-                    <HouseForm>
-                      <Button variant={"default"}>
-                        <Edit /> Edit
+              {houses.map((house: HouseTable, index) => (
+                <TableRow key={house.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{house.house_num}</TableCell>
+                  <TableCell>
+                    {house.is_occupied ? (
+                      <Badge>Dihuni</Badge>
+                    ) : (
+                      <Badge variant={"destructive"}>Tidak Dihuni</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {house.is_occupied ? (
+                      <div className="flex justify-between">
+                        <div className="">{house.resident} </div>
+                        <div>
+                          <Button variant={"outline"} asChild>
+                            <a
+                              href={`https://wa.me/62${house.phone.substring(
+                                1
+                              )}`}
+                              target="blank"
+                            >
+                              <MessageCircleMoreIcon />
+                            </a>
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      "-"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-2">
+                      {house.fee_satpam ? (
+                        <Badge>Satpam (lunas)</Badge>
+                      ) : (
+                        <Badge variant={"destructive"}>
+                          Satpam (belum bayar)
+                        </Badge>
+                      )}
+                      {house.fee_kebersihan ? (
+                        <Badge>Kebersihan (lunas)</Badge>
+                      ) : (
+                        <Badge variant={"destructive"}>
+                          Keberishan (belum bayar)
+                        </Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-center gap-2">
+                      <HouseForm id={house.id} onSuccess={fetchHouses}>
+                        <Button variant={"default"}>
+                          <Edit /> Edit
+                        </Button>
+                      </HouseForm>
+                      <Button variant={"outline"} asChild>
+                        <a
+                          href={`/house-management/${house.id}/resident-history`}
+                        >
+                          <User /> History Penghuni
+                        </a>
                       </Button>
-                    </HouseForm>
-                    <Button variant={"outline"} asChild>
-                      <a href="/house-management/0/resident-history">
-                        <User /> History Penghuni
-                      </a>
-                    </Button>
-                    <Button variant={"default"}>
-                      <Wallet />
-                      <a href="/house-management/0/payment-history">
-                        History Pembayaran
-                      </a>
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
+                      <Button variant={"default"}>
+                        <Wallet />
+                        <a
+                          href={`/house-management/${house.id}/payment-history`}
+                        >
+                          History Pembayaran
+                        </a>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>

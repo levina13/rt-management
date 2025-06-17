@@ -13,7 +13,7 @@ class FeeCategorySeeder extends Seeder
      */
     public function run(): void
     {
-        FeeCategory::create(['nama' => 'Satpam', 'amount' => 100000]);
-        FeeCategory::create(['nama' => 'Kebersihan', 'amount' => 15000]);
+        FeeCategory::create(['name' => 'Satpam', 'amount' => 100000]);
+        FeeCategory::create(['name' => 'Kebersihan', 'amount' => 15000]);
     }
 }

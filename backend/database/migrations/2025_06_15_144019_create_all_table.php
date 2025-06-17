@@ -17,7 +17,7 @@ return new class extends Migration
         // Fee Categories
         Schema::create('fee_categories', function (Blueprint $table) {
             $table->tinyIncrements('id');
-            $table->string('nama', 50);
+            $table->string('name', 50);
             $table->unsignedInteger('amount');
         });
 
@@ -49,8 +49,7 @@ return new class extends Migration
             $table->mediumIncrements('id');
             $table->unsignedMediumInteger('contract_id');
             $table->foreign('contract_id')->references('id')->on('contracts');
-            $table->unsignedTinyInteger('fee_category');
-            $table->foreign('fee_category')->references('id')->on('fee_categories')->onDelete('cascade');
+            $table->enum('fee_category', ['kebersihan', 'satpam']);
             $table->string('periode', 7); // format: YYYY-MM
             $table->date('paid_at')->nullable();
         });
