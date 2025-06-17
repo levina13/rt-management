@@ -57,12 +57,13 @@ Salin file konfigurasi:
 cp .env.example .env
 ```
 
-Edit file `.env`, pastikan seperti ini:
+Edit file hasil copy menjadi `.env`, dan pastikan isinya seperti ini:
 
 ```env
-APP_URL=http://127.0.0.1:8000
+APP_URL=http://localhost:8000
+FRONTEND_URL=http://localhost:5173
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
+DB_HOST=localhost
 DB_PORT=3306
 DB_DATABASE=rt_management
 DB_USERNAME=root
@@ -86,7 +87,7 @@ php artisan serve --port=8000
 Laravel akan aktif di:
 
 ```
-http://127.0.0.1:8000
+http://localhost:8000
 ```
 
 ---
@@ -146,4 +147,4 @@ rt-management/
 ## ❓ Pertanyaan Umum
 
 **Q: Saya tidak bisa membuka Laravel?**  
-A: Pastikan Anda sudah menjalankan `php artisan serve --port=8000` dan URL-nya adalah `http://127.0.0.1:8000`.
+A: Pastikan Anda sudah menjalankan `php artisan serve --port=8000` dan URL-nya adalah `http://localhost:8000`.
