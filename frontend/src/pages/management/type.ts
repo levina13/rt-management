@@ -30,12 +30,25 @@ export type FeeHistoryTable = {
   paid_at: string
 }
 
+export type ExpenseHistoryTable = {
+  id: number
+  expense_category: string
+  desc: string
+  date: string
+  amount: number
+}
+
 export type House = {
   id: number
   house_num: string
 }
 
 export type Resident = {
+  id: number
+  name: string
+}
+
+export type ExpenseCategory = {
   id: number
   name: string
 }

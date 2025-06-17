@@ -69,7 +69,6 @@ return new class extends Migration
             $table->text('description');
             $table->unsignedInteger('amount');
             $table->date('date');
-            $table->string('bukti', 255); // path to image
         });
     }
 

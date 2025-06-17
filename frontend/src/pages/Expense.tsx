@@ -1,5 +1,4 @@
 import ExpenseForm from "@/components/forms/expense-form"
-import { ImageModal } from "@/components/image-modal"
 import Layout from "@/components/Layout"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -12,9 +11,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit, PlusSquare } from "lucide-react"
+import { api } from "@/lib/axios"
+import { PlusSquare } from "lucide-react"
+import { useEffect, useState } from "react"
+import type { ExpenseHistoryTable } from "./management/type"
+import { rupiah } from "@/lib/utils"
 
 export default function Expense() {
+  const [expenses, setExpenses] = useState([])
+
+  function fetchExpenses() {
+    api
+      .get("/expense-history-table")
+      .then((res) => setExpenses(res.data))
+      .catch((err) => console.error(err))
+  }
+  useEffect(() => {
+    fetchExpenses()
+  }, [])
+
   return (
     <>
       <Layout>
@@ -41,33 +56,20 @@ export default function Expense() {
                   <TableHead>Deskripsi</TableHead>
                   <TableHead>Tanggal</TableHead>
                   <TableHead>Jumlah</TableHead>
-                  <TableHead className="text-center">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>
-                    <Badge>Satpam</Badge>
-                    <Badge>Lainnya</Badge>
-                  </TableCell>
-                  <TableCell>Satpam Januari 2020</TableCell>
-                  <TableCell>5 Januari 2025</TableCell>
-                  <TableCell>500.000</TableCell>
-
-                  <TableCell className="">
-                    <div className="flex justify-center gap-2">
-                      <ImageModal url="..." alt="...">
-                        <Button variant={"outline"}>Bukti</Button>
-                      </ImageModal>
-                      <ExpenseForm>
-                        <Button variant={"default"}>
-                          <Edit /> Edit
-                        </Button>
-                      </ExpenseForm>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                {expenses.map((expense: ExpenseHistoryTable, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">{index + 1}</TableCell>
+                    <TableCell>
+                      <Badge>{expense.expense_category}</Badge>
+                    </TableCell>
+                    <TableCell>{expense.desc}</TableCell>
+                    <TableCell>{expense.date}</TableCell>
+                    <TableCell>{rupiah(expense.amount)}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>

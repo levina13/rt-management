@@ -9,6 +9,8 @@ class ExpenseCategory extends Model
     protected $fillable = ['name'];
     public $timestamps = false;
 
+
+
     public function expenses()
     {
         return $this->hasMany(Expense::class, 'expense_category');

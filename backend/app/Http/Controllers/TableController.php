@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Expense;
+use App\Models\ExpenseCategory;
 use App\Models\Fee;
 use App\Models\House;
 use App\Models\Resident;
@@ -76,6 +78,21 @@ class TableController extends Controller
                 'fee_category' => $feeHistory->fee_category,
                 'periode' => $feeHistory->periode,
                 'paid_at' => $feeHistory->paid_at,
+            ];
+        });
+        return response()->json($data);
+    }
+
+    public function ExpenseHistoryTable()
+    {
+        $expenseHistories = Expense::all();
+        $data = $expenseHistories->map(function ($expenseHistory) {
+            return [
+                "id" => $expenseHistory->id,
+                "expense_category" => $expenseHistory->category->name,
+                "desc" => $expenseHistory->description,
+                "date" => $expenseHistory->date,
+                "amount" => $expenseHistory->amount,
             ];
         });
         return response()->json($data);

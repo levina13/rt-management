@@ -37,7 +37,6 @@ export default function PaymentForm({
   // Fetch rumah (yang tidak kosong)
   useEffect(() => {
     api.get("/houses").then((res) => setHouses(res.data))
-    // api.get("/fee-categories").then((res) => setFeeCategories(res.data))
   }, [])
 
   useEffect(() => {
@@ -81,7 +80,6 @@ export default function PaymentForm({
         fee_category: form.fee_category,
         fee_count: parseInt(form.fee_count),
       }
-      console.log(payload)
 
       await api.post("/fees", payload)
 
