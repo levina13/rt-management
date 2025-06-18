@@ -60,7 +60,7 @@ cp .env.example .env
 Edit file hasil copy menjadi `.env`, dan pastikan isinya seperti ini:
 
 ```env
-APP_KEY=base64:dg/uqONCUh68Cp/gf44r/Z5v+khZ8/ewuFKlkF8W1Q4=
+APP_KEY=
 APP_URL=http://localhost:8000
 FRONTEND_URL=http://localhost:5137
 DB_CONNECTION=mysql
