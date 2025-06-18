@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseTransactionController;
+use App\Http\Controllers\FeeCategoryController;
 use App\Http\Controllers\HouseController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\PaymentTransactionController;
@@ -17,6 +19,7 @@ Route::get('/user', function (Request $request) {
 Route::apiResource('houses', HouseController::class);
 Route::apiResource('residents', ResidentController::class);
 Route::apiResource('expense-categories', ExpenseCategoryController::class);
+Route::apiResource('fee-categories', FeeCategoryController::class);
 
 
 // Get Table
@@ -25,10 +28,14 @@ Route::get('/resident-table', [TableController::class, 'ResidentTable']);
 Route::get('/fee-history-table', [TableController::class, 'FeeHistoryTable']);
 Route::get('/expense-history-table', [TableController::class, 'ExpenseHistoryTable']);
 
+// GET
+Route::get('/fees/max-months/{houseId}/{category}', [PaymentTransactionController::class, 'getMaxMonths']);
+Route::get('/dashboard/card-data', [DashboardController::class, 'TotalExpensePayment']);
+Route::get('/dashboard/graph-data/{year}', [DashboardController::class, 'GraphDataByYear']);
+Route::get('/dashboard/table-data/{year}/{month}', [DashboardController::class, 'ExpensePaymentByMonth']);
+
+
 // POST
 Route::post('/upload-ktp', [ImageController::class, 'StoreKTP']);
 Route::post('/fees', [PaymentTransactionController::class, 'store']);
 Route::post('/expenses', [ExpenseTransactionController::class, 'store']);
-
-// GET Max-month for pay
-Route::get('/fees/max-months/{houseId}/{category}', [PaymentTransactionController::class, 'getMaxMonths']);

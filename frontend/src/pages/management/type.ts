@@ -53,4 +53,8 @@ export type ExpenseCategory = {
   name: string
 }
 
-export const FeeCategory = ["satpam", "kebersihan"]
+export type FeeCategory = {
+  id: number
+  name: string
+  amount: number
+}

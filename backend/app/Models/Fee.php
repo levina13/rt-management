@@ -18,4 +18,18 @@ class Fee extends Model
     {
         return $this->belongsTo(FeeCategory::class, 'fee_category');
     }
+
+    public static function getTotalByMonth($year, $month)
+    {
+        $fees = self::join('fee_categories', 'fees.fee_category', '=', 'fee_categories.id')
+            ->whereYear('fees.paid_at', $year)
+            ->whereMonth('fees.paid_at', $month)
+            ->sum('fee_categories.amount');
+        return $fees;
+    }
+    public static function getTotalPreviousYear($year_now)
+    {
+        return self::join('fee_categories', 'fees.fee_category', '=', 'fee_categories.id')
+            ->whereRaw('YEAR(fees.paid_at) < ?', [$year_now])->sum('fee_categories.amount');
+    }
 }

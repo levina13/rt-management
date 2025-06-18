@@ -49,7 +49,8 @@ return new class extends Migration
             $table->mediumIncrements('id');
             $table->unsignedMediumInteger('contract_id');
             $table->foreign('contract_id')->references('id')->on('contracts');
-            $table->enum('fee_category', ['kebersihan', 'satpam']);
+            $table->unsignedTinyInteger('fee_category');
+            $table->foreign('fee_category')->references('id')->on('fee_categories');
             $table->string('periode', 7); // format: YYYY-MM
             $table->date('paid_at')->nullable();
         });

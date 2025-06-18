@@ -13,7 +13,7 @@ import {
 import { ScrollArea } from "../ui/scroll-area"
 import { Scrollbar } from "@radix-ui/react-scroll-area"
 import { api } from "@/lib/axios"
-import { FeeCategory, type House } from "@/pages/management/type"
+import { type FeeCategory, type House } from "@/pages/management/type"
 
 export default function PaymentForm({
   children,
@@ -33,10 +33,12 @@ export default function PaymentForm({
   const [open, setOpen] = useState(false)
   const [maxMonths, setMaxMonths] = useState(0)
   const [houses, setHouses] = useState<House[]>([])
+  const [categories, setCategories] = useState<FeeCategory[]>([])
 
   // Fetch rumah (yang tidak kosong)
   useEffect(() => {
     api.get("/houses").then((res) => setHouses(res.data))
+    api.get("/fee-categories").then((res) => setCategories(res.data))
   }, [])
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export default function PaymentForm({
     try {
       const payload = {
         house_id: parseInt(form.house_id),
-        fee_category: form.fee_category,
+        fee_category: parseInt(form.fee_category),
         fee_count: parseInt(form.fee_count),
       }
 
@@ -128,9 +130,12 @@ export default function PaymentForm({
                       <SelectValue placeholder="Pilih iuran" />
                     </SelectTrigger>
                     <SelectContent>
-                      {FeeCategory.map((f) => (
-                        <SelectItem key={f} value={String(f)}>
-                          {f}
+                      {categories.map((category) => (
+                        <SelectItem
+                          key={category.id}
+                          value={String(category.id)}
+                        >
+                          {category.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

@@ -28,7 +28,7 @@ class PaymentTransactionController extends Controller
     {
         $validated = $request->validate([
             'house_id' => 'required',
-            'fee_category' => 'required|string',
+            'fee_category' => 'required',
             'fee_count' => 'required',
         ]);
         $fee_count = $validated['fee_count'];

@@ -75,7 +75,7 @@ class TableController extends Controller
                 'house_num' => $contract->house->house_num,
                 'resident_name' => $contract->resident?->name,
                 'resident_phone' => $contract->resident->phone,
-                'fee_category' => $feeHistory->fee_category,
+                'fee_category' => $feeHistory->category->name,
                 'periode' => $feeHistory->periode,
                 'paid_at' => $feeHistory->paid_at,
             ];
