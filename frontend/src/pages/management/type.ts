@@ -58,3 +58,10 @@ export type FeeCategory = {
   name: string
   amount: number
 }
+
+export type ChartData = {
+  month: number
+  payment: number
+  expense: number
+  balance: number
+}

@@ -24,13 +24,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { LucideBookOpen } from "lucide-react"
 import { ImageModal } from "@/components/image-modal"
+import { type ChartData } from "./management/type"
+import { rupiah } from "@/lib/utils"
+import { api } from "@/lib/axios"
 
 export default function Dashboard() {
-  const [month, setMonth] = React.useState("January")
+  const initialCard = {
+    balance: 0,
+    total_expenses: 0,
+    total_payments: 0,
+  }
+  const [year, setYear] = useState(2025)
+  const [month, setMonth] = useState("January")
+  const [chartData, setChartData] = useState<ChartData[]>([])
+  const [cardData, setCardData] = useState(initialCard)
+  const [tableData, setTableData] = useState([])
+
+  function fetchCardData() {
+    api
+      .get("/dashboard/card-data")
+      .then((res) => setCardData(res.data))
+      .catch((err) => console.error(err))
+  }
+
+  function fetchChartData(year: number) {
+    api
+      .get(`/dashboard/chart-data/${year}`)
+      .then((res) => setChartData(res.data))
+      .catch((err) => console.error(err))
+  }
+
+  function fetchTableData(year: number, month: number) {
+    api
+      .get(`/dashboard/table-data/${year}/${month}`)
+      .then((res) => setTableData(res.data))
+      .catch((err) => console.error(err))
+  }
+
+  useEffect(() => {
+    fetchCardData()
+    fetchChartData(2025)
+    fetchTableData(2025, 5)
+  })
+
   return (
     <>
       <Layout>
@@ -42,7 +82,7 @@ export default function Dashboard() {
                   Saldo Sekarang
                 </CardDescription>
                 <CardTitle className="text-4xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                  Rp. 1.000.000,-
+                  {rupiah(cardData.balance)}
                 </CardTitle>
               </CardContent>
             </Card>
@@ -52,7 +92,17 @@ export default function Dashboard() {
                   Total Pengeluaran
                 </CardDescription>
                 <CardTitle className="text-4xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                  Rp. 1.000.000,-
+                  {rupiah(cardData.total_expenses)}
+                </CardTitle>
+              </CardContent>
+            </Card>
+            <Card className="w-fit bg-emerald-400 text-secondary">
+              <CardContent>
+                <CardDescription className="text-secondary text-2xl">
+                  Total Pemasukan
+                </CardDescription>
+                <CardTitle className="text-4xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                  {rupiah(cardData.total_payments)}
                 </CardTitle>
               </CardContent>
             </Card>

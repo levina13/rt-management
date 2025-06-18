@@ -31,7 +31,7 @@ Route::get('/expense-history-table', [TableController::class, 'ExpenseHistoryTab
 // GET
 Route::get('/fees/max-months/{houseId}/{category}', [PaymentTransactionController::class, 'getMaxMonths']);
 Route::get('/dashboard/card-data', [DashboardController::class, 'TotalExpensePayment']);
-Route::get('/dashboard/graph-data/{year}', [DashboardController::class, 'GraphDataByYear']);
+Route::get('/dashboard/chart-data/{year}', [DashboardController::class, 'GraphDataByYear']);
 Route::get('/dashboard/table-data/{year}/{month}', [DashboardController::class, 'ExpensePaymentByMonth']);
 
 
