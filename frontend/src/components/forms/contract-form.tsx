@@ -8,7 +8,6 @@ import {
 import { ScrollArea, ScrollBar } from "../ui/scroll-area"
 import { useState } from "react"
 import { Label } from "../ui/label"
-import { Input } from "../ui/input"
 import {
   Select,
   SelectContent,
@@ -28,15 +27,10 @@ export default function ContractForm({
     name: "",
     phone: "",
     isMarried: "no",
-    ktp: "",
     houseNumber: "",
     startDate: "",
     endDate: "",
   })
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
 
   const handleMarriedChange = (value: string) => {
     setForm({ ...form, isMarried: value })
@@ -50,7 +44,7 @@ export default function ContractForm({
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="md:max-w-[70vw] w-fit max-h-[80vh]">
+      <DialogContent className="md:max-w-[30vw] max-h-[80vh]">
         <DialogHeader className="text-center items-center mb-3">
           <div className="text-2xl font-bold">Tambah Penghuni</div>
         </DialogHeader>
@@ -89,17 +83,6 @@ export default function ContractForm({
                 <div className="grid w-full max-w-sm items-center gap-3">
                   <Label htmlFor="Date">Tanggal Akhir</Label>
                   <DatePicker />
-                </div>
-
-                <div className="grid w-full max-w-sm items-center gap-3">
-                  <Label htmlFor="ktp">Bukti Kontrak</Label>
-                  <Input
-                    id="ktp"
-                    name="ktp"
-                    value={form.ktp}
-                    type="file"
-                    onChange={handleChange}
-                  />
                 </div>
               </div>
             </div>

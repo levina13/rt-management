@@ -50,8 +50,8 @@ export default function ResidentHistory() {
                   <TableCell className="">
                     <div className="flex flex-col">
                       <Badge>Kontrak</Badge>
-                      <Badge variant={"secondary"}>Tetap</Badge>
-                      <Badge variant={"destructive"}>Tidak Aktif</Badge>
+                      {/* <Badge variant={"secondary"}>Tetap</Badge>
+                      <Badge variant={"destructive"}>Tidak Aktif</Badge> */}
                     </div>
                   </TableCell>
                   <TableCell>20 Oktober 2020</TableCell>

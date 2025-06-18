@@ -112,11 +112,18 @@ Jalankan React di port 5137:
 npm run dev -- --port 5137
 ```
 
-React akan aktif di:
+React akan aktif dan dapat diakses di:
 
 ```
 http://localhost:5137
 ```
+
+---
+
+### 4. **Buka Aplikasi Website**
+
+Aplikasi dapat diakses di
+http://localhost:5137
 
 ---
 

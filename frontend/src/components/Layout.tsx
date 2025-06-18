@@ -16,7 +16,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <AppSidebar />
         <SidebarInset>
           <SidebarTrigger className="p-5 m-5" variant={"default"} />
-          <main className=" container md:px-10">{children}</main>
+          <main className=" container px-10 pb-10">{children}</main>
         </SidebarInset>
       </SidebarProvider>
     </>

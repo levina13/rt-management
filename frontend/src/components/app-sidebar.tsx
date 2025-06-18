@@ -29,7 +29,7 @@ const items = [
     icon: Wallet,
   },
   {
-    title: "Penghuni",
+    title: "Warga",
     url: "/resident-management",
     icon: Users,
   },

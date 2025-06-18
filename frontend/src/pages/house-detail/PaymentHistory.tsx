@@ -52,7 +52,7 @@ export default function PaymentHistory() {
                   <TableCell className="">Iuran Kebersihan</TableCell>
                   <TableCell>
                     <Badge>Lunas</Badge>
-                    <Badge variant={"destructive"}>Belum Bayar</Badge>
+                    {/* <Badge variant={"destructive"}>Belum Bayar</Badge> */}
                   </TableCell>
                   <TableCell>20 Oktober 2025</TableCell>
                   <TableCell className="">
