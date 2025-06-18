@@ -19,7 +19,6 @@ class ExpenseSeeder extends Seeder
             'description' => 'Gaji satpam bulan Mei 2025',
             'amount' => 1000000,
             'date' => Carbon::now()->subMonth()->endOfMonth()->toDateString(),
-            'bukti' => 'bukti_gaji.jpg',
         ]);
 
         Expense::create([
@@ -27,7 +26,6 @@ class ExpenseSeeder extends Seeder
             'description' => 'Token listrik pos bulan Mei 2025',
             'amount' => 250000,
             'date' => Carbon::now()->subMonth()->endOfMonth()->toDateString(),
-            'bukti' => 'bukti_token.jpg',
         ]);
     }
 }
