@@ -13,7 +13,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import type { ChartData } from "@/pages/management/type"
-import { rupiah } from "@/lib/utils"
 
 export const description = "An interactive area chart"
 
@@ -32,19 +31,6 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-const CustomTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="custom-tooltip">
-        <p className="label">{`${label} : ${payload[0].value}`}</p>
-        <p className="desc">Anything you want can be displayed here.</p>
-      </div>
-    )
-  }
-
-  return null
-}
-
 export function AnnualChart({
   chartData,
   children,
@@ -52,9 +38,6 @@ export function AnnualChart({
   chartData: ChartData[]
   children: React.ReactNode
 }) {
-  const [timeRange, setTimeRange] = React.useState("90d")
-  // const [chartDataFinal, setChart]
-
   return (
     <Card className="pt-0">
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">

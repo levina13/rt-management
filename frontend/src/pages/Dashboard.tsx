@@ -25,12 +25,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import React, { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { LucideBookOpen } from "lucide-react"
-import { ImageModal } from "@/components/image-modal"
 import { type ChartData } from "./management/type"
 import { rupiah } from "@/lib/utils"
 import { api } from "@/lib/axios"
+import { months } from "@/lib/var"
 
 function generateYearsBetween(startYear = 2024) {
   const endDate = new Date().getFullYear()
@@ -50,7 +48,7 @@ export default function Dashboard() {
     total_payments: 0,
   }
   const [year, setYear] = useState("2025")
-  const [month, setMonth] = useState("January")
+  const [month, setMonth] = useState(months[0].value)
   const [chartData, setChartData] = useState<ChartData[]>([])
   const [cardData, setCardData] = useState(initialCard)
   const [tableData, setTableData] = useState([])
@@ -80,10 +78,15 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    console.log("halo")
     fetchCardData()
+  }, [])
+
+  useEffect(() => {
     fetchChartData(parseInt(year))
-    fetchTableData(parseInt(year), 5)
+  }, [year])
+
+  useEffect(() => {
+    fetchTableData(parseInt(year), parseInt(month))
   }, [year, month])
 
   return (
@@ -152,18 +155,14 @@ export default function Dashboard() {
                     className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
                     aria-label="Select a value"
                   >
-                    <SelectValue placeholder="january" />
+                    <SelectValue placeholder="1" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
-                    <SelectItem value="january" className="rounded-lg">
-                      january
-                    </SelectItem>
-                    <SelectItem value="february" className="rounded-lg">
-                      february
-                    </SelectItem>
-                    <SelectItem value="March" className="rounded-lg">
-                      March
-                    </SelectItem>
+                    {months.map((month) => (
+                      <SelectItem key={month.value} value={String(month.value)}>
+                        {month.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </CardHeader>
@@ -177,32 +176,24 @@ export default function Dashboard() {
                       <TableHead>Tanggal</TableHead>
                       <TableHead>Jenis</TableHead>
                       <TableHead>Jumlah</TableHead>
-                      <TableHead>Saldo</TableHead>
-                      <TableHead>Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">1</TableCell>
-                      <TableCell>
-                        Iuran Satpam ruma A-1 Periode Februari 2025
-                      </TableCell>
-                      <TableCell>21 Januari 2025</TableCell>
-                      <TableCell>
-                        <Badge variant={"default"}>Masuk</Badge>
-                        <Badge variant={"destructive"}>Keluar</Badge>
-                      </TableCell>
-                      <TableCell className="">Rp.200.000</TableCell>
-                      <TableCell>Rp. 500.000</TableCell>
-                      <TableCell>
-                        <ImageModal url="..." alt="...">
-                          <Button>
-                            <LucideBookOpen />
-                            Bukti
-                          </Button>
-                        </ImageModal>
-                      </TableCell>
-                    </TableRow>
+                    {tableData.map((row, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>{row["name"]}</TableCell>
+                        <TableCell>{row["date"]}</TableCell>
+                        <TableCell>
+                          {row["type"] == "Pemasukan" ? (
+                            <Badge>Pemasukan</Badge>
+                          ) : (
+                            <Badge variant={"destructive"}>Pengeluaran</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>{row["amount"]}</TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </CardContent>
