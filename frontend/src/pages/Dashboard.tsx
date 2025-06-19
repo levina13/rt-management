@@ -32,17 +32,29 @@ import { type ChartData } from "./management/type"
 import { rupiah } from "@/lib/utils"
 import { api } from "@/lib/axios"
 
+function generateYearsBetween(startYear = 2024) {
+  const endDate = new Date().getFullYear()
+  const years = []
+
+  for (let i = startYear; i <= endDate; i++) {
+    years.push(String(startYear))
+    startYear++
+  }
+  return years
+}
+
 export default function Dashboard() {
   const initialCard = {
     balance: 0,
     total_expenses: 0,
     total_payments: 0,
   }
-  const [year, setYear] = useState(2025)
+  const [year, setYear] = useState("2025")
   const [month, setMonth] = useState("January")
   const [chartData, setChartData] = useState<ChartData[]>([])
   const [cardData, setCardData] = useState(initialCard)
   const [tableData, setTableData] = useState([])
+  const yearList = generateYearsBetween()
 
   function fetchCardData() {
     api
@@ -54,7 +66,9 @@ export default function Dashboard() {
   function fetchChartData(year: number) {
     api
       .get(`/dashboard/chart-data/${year}`)
-      .then((res) => setChartData(res.data))
+      .then((res) => {
+        setChartData(res.data)
+      })
       .catch((err) => console.error(err))
   }
 
@@ -66,10 +80,11 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
+    console.log("halo")
     fetchCardData()
-    fetchChartData(2025)
-    fetchTableData(2025, 5)
-  })
+    fetchChartData(parseInt(year))
+    fetchTableData(parseInt(year), 5)
+  }, [year, month])
 
   return (
     <>
@@ -108,7 +123,23 @@ export default function Dashboard() {
             </Card>
           </div>
           <div className="mt-5">
-            <AnnualChart />
+            <AnnualChart chartData={chartData}>
+              <Select value={year} onValueChange={setYear}>
+                <SelectTrigger
+                  className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
+                  aria-label="Pilih Tahun"
+                >
+                  <SelectValue placeholder="2025" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {yearList.map((year) => (
+                    <SelectItem className="rounded-lg" key={year} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </AnnualChart>
           </div>
           <div className="mt-10 flex flex-col">
             <Card className="pt-0">

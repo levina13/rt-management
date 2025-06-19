@@ -3,13 +3,7 @@
 import * as React from "react"
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   type ChartConfig,
   ChartContainer,
@@ -18,94 +12,56 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import type { ChartData } from "@/pages/management/type"
+import { rupiah } from "@/lib/utils"
 
 export const description = "An interactive area chart"
 
-const chartData = [
-  { date: "2024-01-01", pemasukan: 222, pengeluaran: 150, saldo: 70 },
-  { date: "2024-02-02", pemasukan: 97, pengeluaran: 180, saldo: 100 },
-  { date: "2024-03-03", pemasukan: 167, pengeluaran: 120, saldo: 120 },
-  { date: "2024-04-04", pemasukan: 242, pengeluaran: 260, saldo: 50 },
-  { date: "2024-05-05", pemasukan: 373, pengeluaran: 290, saldo: 100 },
-  { date: "2024-06-06", pemasukan: 301, pengeluaran: 340, saldo: 200 },
-  { date: "2024-07-07", pemasukan: 245, pengeluaran: 180, saldo: 350 },
-  { date: "2024-08-08", pemasukan: 409, pengeluaran: 320, saldo: 400 },
-  { date: "2024-09-09", pemasukan: 59, pengeluaran: 110, saldo: 200 },
-  { date: "2024-10-10", pemasukan: 261, pengeluaran: 190, saldo: 250 },
-  { date: "2024-11-11", pemasukan: 327, pengeluaran: 350, saldo: 270 },
-  { date: "2024-12-11", pemasukan: 327, pengeluaran: 350, saldo: 300 },
-]
-
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  pemasukan: {
+  income: {
     label: "Pemasukan",
-    color: "black",
+    color: "green",
   },
-  pengeluaran: {
+  expense: {
     label: "Pengeluaran",
     color: "red",
   },
-  saldo: {
+  balance: {
     label: "Saldo",
-    color: "green",
+    color: "black",
   },
 } satisfies ChartConfig
 
-export function AnnualChart() {
-  const [timeRange, setTimeRange] = React.useState("90d")
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="custom-tooltip">
+        <p className="label">{`${label} : ${payload[0].value}`}</p>
+        <p className="desc">Anything you want can be displayed here.</p>
+      </div>
+    )
+  }
 
-  const filteredData = chartData.filter((item) => {
-    const date = new Date(item.date)
-    const referenceDate = new Date("2024-06-30")
-    let daysToSubtract = 90
-    if (timeRange === "30d") {
-      daysToSubtract = 30
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7
-    }
-    const startDate = new Date(referenceDate)
-    startDate.setDate(startDate.getDate() - daysToSubtract)
-    return date >= startDate
-  })
+  return null
+}
+
+export function AnnualChart({
+  chartData,
+  children,
+}: {
+  chartData: ChartData[]
+  children: React.ReactNode
+}) {
+  const [timeRange, setTimeRange] = React.useState("90d")
+  // const [chartDataFinal, setChart]
 
   return (
     <Card className="pt-0">
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1">
-          <CardTitle>Grafik Iuran, pengeluaran, dan saldo</CardTitle>
-          <CardDescription>
-            Showing total visitors for the last 3 months
-          </CardDescription>
+          <CardTitle>Grafik Pemasukan, Pengeluaran, dan Saldo</CardTitle>
         </div>
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger
-            className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
-            aria-label="Select a value"
-          >
-            <SelectValue placeholder="Last 3 months" />
-          </SelectTrigger>
-          <SelectContent className="rounded-xl">
-            <SelectItem value="90d" className="rounded-lg">
-              Last 3 months
-            </SelectItem>
-            <SelectItem value="30d" className="rounded-lg">
-              Last 30 days
-            </SelectItem>
-            <SelectItem value="7d" className="rounded-lg">
-              Last 7 days
-            </SelectItem>
-          </SelectContent>
-        </Select>
+        {children}
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
@@ -114,90 +70,74 @@ export function AnnualChart() {
         >
           <LineChart data={chartData}>
             <defs>
-              <linearGradient id="fillPemasukan" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillincome" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-pemasukan)"
+                  stopColor="var(--color-income)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-pemasukan)"
+                  stopColor="var(--color-income)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
-              <linearGradient id="fillPengeluaran" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillexpense" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-pengeluaran)"
+                  stopColor="var(--color-expense)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-pengeluaran)"
+                  stopColor="var(--color-expense)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
-              <linearGradient id="fillSaldo" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillbalance" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-saldo)"
+                  stopColor="var(--color-balance)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-saldo)"
+                  stopColor="var(--color-balance)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="date"
+              dataKey="month"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
-              tickFormatter={(value) => {
-                const date = new Date(value)
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                })
-              }}
             />
             <ChartTooltip
               cursor={false}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }}
-                  indicator="dot"
-                />
-              }
+              content={<ChartTooltipContent indicator="dot" />}
             />
             <Line
-              dataKey="pengeluaran"
+              dataKey="expense"
               type="natural"
-              fill="url(#fillPengeluaran)"
-              stroke="var(--color-pengeluaran)"
+              fill="url(#fillexpense)"
+              stroke="var(--color-expense)"
               dot={false}
             />
             <Line
-              dataKey="pemasukan"
+              dataKey="income"
               type="natural"
-              fill="url(#fillSaldo)"
-              stroke="var(--color-pemasukan)"
+              fill="url(#fillincome)"
+              stroke="var(--color-income)"
               dot={false}
             />
             <Line
-              dataKey="saldo"
+              dataKey="balance"
               type="natural"
-              fill="url(#fillSaldo)"
-              stroke="var(--color-saldo)"
+              fill="url(#fillbalance)"
+              stroke="var(--color-balance)"
               dot={false}
             />
             <ChartLegend content={<ChartLegendContent />} />

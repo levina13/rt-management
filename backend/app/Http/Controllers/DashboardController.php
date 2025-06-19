@@ -29,18 +29,32 @@ class DashboardController extends Controller
 
     public function GraphDataByYear($year)
     {
+        // return Fee::all();
 
         $data = [];
         $balance = Fee::getTotalPreviousYear($year) - Expense::getTotalPreviousYear($year);
-
+        $monthNames = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        ];
         for ($month = 1; $month <= 12; $month++) {
             $expense = Expense::getTotalByMonth($year, $month);
-            $payment = Fee::getTotalByMonth($year, $month);
-            $balance -= ($payment - $expense);
+            $income = Fee::getTotalByMonth($year, $month);
+            $balance += ($income - $expense);
 
             $data[] = [
-                'month' => $month,
-                'payment' => $payment,
+                'month' => $monthNames[$month - 1],
+                'income' => $income,
                 'expense' => $expense,
                 'balance' => $balance,
             ];
