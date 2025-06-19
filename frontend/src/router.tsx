@@ -30,11 +30,11 @@ const router = createBrowserRouter([
     children: [],
   },
   {
-    path: "/house-management/:houseNumber/resident-history",
+    path: "/house-management/:houseId/resident-history",
     element: <ResidentHistory />,
   },
   {
-    path: "/house-management/:houseNumber/payment-history",
+    path: "/house-management/:houseId/payment-history",
     element: <PaymentHistory />,
   },
 ])

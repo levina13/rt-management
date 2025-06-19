@@ -27,6 +27,7 @@ Route::get('/house-table', [TableController::class, 'HouseTable']);
 Route::get('/resident-table', [TableController::class, 'ResidentTable']);
 Route::get('/fee-history-table', [TableController::class, 'FeeHistoryTable']);
 Route::get('/expense-history-table', [TableController::class, 'ExpenseHistoryTable']);
+Route::get('/houses/{id}/residents', [HouseController::class, 'ResidentHistories']);
 
 // GET
 Route::get('/fees/max-months/{houseId}/{category}', [PaymentTransactionController::class, 'getMaxMonths']);
@@ -35,7 +36,9 @@ Route::get('/dashboard/chart-data/{year}', [DashboardController::class, 'GraphDa
 Route::get('/dashboard/table-data/{year}/{month}', [DashboardController::class, 'ExpensePaymentByMonth']);
 
 
+
 // POST
 Route::post('/upload-ktp', [ImageController::class, 'StoreKTP']);
 Route::post('/fees', [PaymentTransactionController::class, 'store']);
 Route::post('/expenses', [ExpenseTransactionController::class, 'store']);
+Route::post('/houses/{house_id}/residents', [HouseController::class, 'storeResident']);

@@ -64,4 +64,40 @@ class HouseController extends Controller
     {
         //
     }
+
+    public function ResidentHistories(string $id)
+    {
+        $contracts = House::find($id)->contracts;
+
+        $data = [];
+        foreach ($contracts as $contract) {
+            $resident = $contract->resident;
+            $data[] = [
+                "id" => $contract->id,
+                "name" => $resident->name,
+                "phone" => $resident->phone,
+                "category" => $contract->contract_category,
+                "start_date" => $contract->start_date,
+                "end_date" => $contract->end_date,
+
+            ];
+        }
+
+        return response()->json($data);
+    }
+
+    public function storeResident(Request $request, string $house_id)
+    {
+        $data = $request->validate([
+            'resident_id' => 'required',
+            'category' => 'required',
+            'start_date' => 'required'
+        ]);
+        $data["end_date"] = $request["end_date"];
+        $data["house_id"] = $request["house_id"];
+
+
+        $contract = Contract::create($data);
+        return response()->json($contract, 201);
+    }
 }

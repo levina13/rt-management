@@ -26,4 +26,10 @@ class House extends Model
     {
         return $this->currentContract?->resident;
     }
+
+    public function residents()
+    {
+        $residents = $this->hasManyThrough(House::class, Contract::class);
+        return $residents;
+    }
 }

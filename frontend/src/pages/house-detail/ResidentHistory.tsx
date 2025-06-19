@@ -11,9 +11,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit, MessageCircleMore, PlusSquare } from "lucide-react"
+import { api } from "@/lib/axios"
+import { Edit, MessageCircleMoreIcon, PlusSquare } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
 
 export default function ResidentHistory() {
+  const { houseId } = useParams<{ houseId: string }>()
+  const [residents, setResidents] = useState([])
+  // const [isActive, setIsActive] = useState(false)
+
+  function fetchResidents() {
+    api
+      .get(`/houses/${houseId}/residents`)
+      .then((res) => setResidents(res.data))
+      .catch((err) => console.error(err))
+  }
+
+  useEffect(() => {
+    fetchResidents()
+  }, [])
+
   return (
     <>
       <Layout>
@@ -23,7 +41,7 @@ export default function ResidentHistory() {
           </div>
           <div className="mt-5 flex flex-row-reverse">
             <div className="flex flex-row-reverse">
-              <ContractForm>
+              <ContractForm onSuccess={fetchResidents}>
                 <Button variant={"default"}>
                   <PlusSquare /> Tambah Penghuni
                 </Button>
@@ -44,31 +62,50 @@ export default function ResidentHistory() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>Arjuna</TableCell>
-                  <TableCell className="">
-                    <div className="flex flex-col">
-                      <Badge>Kontrak</Badge>
-                      {/* <Badge variant={"secondary"}>Tetap</Badge>
-                      <Badge variant={"destructive"}>Tidak Aktif</Badge> */}
-                    </div>
-                  </TableCell>
-                  <TableCell>20 Oktober 2020</TableCell>
-                  <TableCell>20 Oktober 2025</TableCell>
-                  <TableCell className="">
-                    <div className="flex justify-center gap-2">
-                      <ContractForm>
-                        <Button variant={"default"}>
-                          <Edit /> Edit
-                        </Button>
-                      </ContractForm>
-                      <Button variant={"secondary"}>
-                        <MessageCircleMore /> Chat
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                {residents.map((resident, index) => (
+                  <TableRow key={resident["id"]}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      <div className="flex justify-between">
+                        <div>{resident["name"]}</div>
+                        <div>
+                          <Button variant={"outline"} asChild>
+                            <a
+                              href={`https://wa.me/62${String(
+                                resident["phone"]
+                              ).substring(1)}`}
+                              target="blank"
+                            >
+                              <MessageCircleMoreIcon />
+                            </a>
+                          </Button>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {resident["category"] == "permanen" ? (
+                        <Badge variant={"default"}>
+                          {resident["category"]}
+                        </Badge>
+                      ) : (
+                        <Badge variant={"outline"}>
+                          {resident["category"]}
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>{resident["start_date"]}</TableCell>
+                    <TableCell>{resident["end_date"] ?? "-"}</TableCell>
+                    <TableCell className="">
+                      {/* <div className="flex justify-center gap-2">
+                        <ContractForm>
+                          <Button variant={"default"}>
+                            <Edit /> Edit
+                          </Button>
+                        </ContractForm>
+                      </div> */}
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>
