@@ -26,7 +26,7 @@ class FeeSeeder extends Seeder
                     'contract_id' => $contract->id,
                     'fee_category' => $category,
                     'periode' => $periode,
-                    'paid_at' => rand(0, 1) ? Carbon::now()->subDays(rand(1, 10)) : null,
+                    'paid_at' => Carbon::now()->subDays(rand(1, 10)),
                 ]);
             }
         }

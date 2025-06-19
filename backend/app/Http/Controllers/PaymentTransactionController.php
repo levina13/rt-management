@@ -48,10 +48,10 @@ class PaymentTransactionController extends Controller
         $insertData = [];
 
         for ($i = 1; $i <= $fee_count; $i++) {
-            $periode = $periode_start->copy()->addMonths($i)->format('Y-m');
+            $periode = $periode_start->copy()->format('Y-m');
 
             $insertData[] = [
-                'contract_id' => $contract->resident->id,
+                'contract_id' => $contract->id,
                 'fee_category' => $fee_category,
                 'periode' => $periode,
                 'paid_at' => $now,

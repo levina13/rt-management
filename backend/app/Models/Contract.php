@@ -22,8 +22,7 @@ class Contract extends Model
 
     public function getFeeStatusByCategory($category)
     {
-        $periode = Carbon::now()->subMonth()->format('Y-m');
-
+        $periode = Carbon::now()->format('Y-m');
         $fee = $this->fees()
             ->where('fee_category', $category)
             ->where('periode', $periode)
