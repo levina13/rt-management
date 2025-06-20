@@ -67,13 +67,15 @@ class HouseController extends Controller
 
     public function ResidentHistories(string $id)
     {
-        $contracts = House::find($id)->contracts;
+        $house = House::find($id);
+        $contracts = $house->contracts;
 
         $data = [];
+        $data["current_contract"] = $house->currentContract->contract_category;
         foreach ($contracts as $contract) {
             $resident = $contract->resident;
-            $data[] = [
-                "id" => $contract->id,
+            $data["residents"][] = [
+                "contract_id" => $contract->id,
                 "name" => $resident->name,
                 "phone" => $resident->phone,
                 "category" => $contract->contract_category,
@@ -88,13 +90,20 @@ class HouseController extends Controller
 
     public function storeResident(Request $request, string $house_id)
     {
+        $house = House::find($house_id);
+
+        if ($house->currentContract?->category == "permanen") {
+            return response()->json(["message" => "Tidak bisa menambah penghuni, rumah sudah dihuni permanen."], 400);
+        } else if ($house->currentContract?->category == "kontrak") {
+            if ($request['start_date'] < $house->currentContract['end_date']) return response()->json(["message" => "Tidak bisa menambah penghuni, rumah masih dihuni."], 400);
+        }
         $data = $request->validate([
             'resident_id' => 'required',
-            'category' => 'required',
+            'contract_category' => 'required',
             'start_date' => 'required'
         ]);
         $data["end_date"] = $request["end_date"];
-        $data["house_id"] = $request["house_id"];
+        $data["house_id"] = $house_id;
 
 
         $contract = Contract::create($data);

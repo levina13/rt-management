@@ -24,10 +24,14 @@ import { useParams } from "react-router-dom"
 export default function ContractForm({
   children,
   onSuccess,
+  id,
 }: {
   children: React.ReactNode
   onSuccess?: () => void
+  id?: number
 }) {
+  const isEditting = !!id
+
   const { houseId } = useParams<{ houseId: string }>()
   const [resident, setResident] = useState("1")
   const [category, setCategory] = useState("kontrak")
@@ -60,19 +64,34 @@ export default function ContractForm({
 
   useEffect(() => {
     fetchResident()
-    console.log(residentList[0])
   }, [open])
+
+  useEffect(() => {
+    if (isEditting && open) {
+      api.get(`/contracts/${id}`).then((res) => {
+        const data = res.data
+        setResident(String(data.resident_id))
+        setCategory(data.contract_category)
+        setStartDate(data.start_date as Date)
+        setEndDate(data.end_date ? new Date(data.end_date) : undefined)
+      })
+    }
+  }, [id, open])
 
   const handleSubmit = async () => {
     const payload = {
       resident_id: parseInt(resident),
-      category: category,
+      contract_category: category,
       start_date: format(startDate as Date, "yyyy-MM-dd"),
-      end_date: endDate ? format(endDate, "yyyy-MM-dd") : "",
+      end_date: endDate ? format(endDate as Date, "yyyy-MM-dd") : "",
+      house_id: houseId,
     }
-    console.log(payload)
     try {
-      await api.post(`/houses/${houseId}/residents`, payload)
+      if (isEditting) {
+        await api.put(`/contracts/${id}`, payload)
+      } else {
+        await api.post(`/houses/${houseId}/residents`, payload)
+      }
       onSuccess?.()
       setOpen(false)
       emptyForm()
@@ -135,7 +154,7 @@ export default function ContractForm({
             </div>
           </div>
 
-          <Button onClick={handleSubmit} className="w-full">
+          <Button onClick={handleSubmit} className="w-full mt-5">
             Simpan
           </Button>
           <ScrollBar />

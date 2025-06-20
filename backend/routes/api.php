@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseTransactionController;
@@ -20,7 +21,7 @@ Route::apiResource('houses', HouseController::class);
 Route::apiResource('residents', ResidentController::class);
 Route::apiResource('expense-categories', ExpenseCategoryController::class);
 Route::apiResource('fee-categories', FeeCategoryController::class);
-
+Route::apiResource('contracts', ContractController::class);
 
 // Get Table
 Route::get('/house-table', [TableController::class, 'HouseTable']);

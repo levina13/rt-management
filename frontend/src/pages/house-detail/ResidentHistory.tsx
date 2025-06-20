@@ -19,12 +19,15 @@ import { useParams } from "react-router-dom"
 export default function ResidentHistory() {
   const { houseId } = useParams<{ houseId: string }>()
   const [residents, setResidents] = useState([])
-  // const [isActive, setIsActive] = useState(false)
+  const [disabled, setDisabled] = useState(false)
 
   function fetchResidents() {
     api
       .get(`/houses/${houseId}/residents`)
-      .then((res) => setResidents(res.data))
+      .then((res) => {
+        setResidents(res.data.residents)
+        setDisabled(res.data.current_contract === "permanen" ? true : false)
+      })
       .catch((err) => console.error(err))
   }
 
@@ -42,7 +45,7 @@ export default function ResidentHistory() {
           <div className="mt-5 flex flex-row-reverse">
             <div className="flex flex-row-reverse">
               <ContractForm onSuccess={fetchResidents}>
-                <Button variant={"default"}>
+                <Button variant={"default"} disabled={disabled}>
                   <PlusSquare /> Tambah Penghuni
                 </Button>
               </ContractForm>
@@ -96,13 +99,16 @@ export default function ResidentHistory() {
                     <TableCell>{resident["start_date"]}</TableCell>
                     <TableCell>{resident["end_date"] ?? "-"}</TableCell>
                     <TableCell className="">
-                      {/* <div className="flex justify-center gap-2">
-                        <ContractForm>
+                      <div className="flex justify-center gap-2">
+                        <ContractForm
+                          onSuccess={fetchResidents}
+                          id={resident["contract_id"]}
+                        >
                           <Button variant={"default"}>
                             <Edit /> Edit
                           </Button>
                         </ContractForm>
-                      </div> */}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
