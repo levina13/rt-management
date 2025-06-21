@@ -24,8 +24,8 @@ class TableController extends Controller
             $feeKebersihan = False;
 
             if ($current_contract) {
-                $feeSatpam = $current_contract->getFeeStatusByCategory('satpam');
-                $feeKebersihan = $current_contract->getFeeStatusByCategory('kebersihan');
+                $feeSatpam = $current_contract->getFeeStatusByCategory(1);
+                $feeKebersihan = $current_contract->getFeeStatusByCategory(2);
             }
 
             return [
