@@ -109,4 +109,26 @@ class HouseController extends Controller
         $contract = Contract::create($data);
         return response()->json($contract, 201);
     }
+
+    public function PaymentHistories(string $house_id)
+    {
+        $house = House::find($house_id);
+
+        $contracts = $house->contracts;
+        $data = [];
+        $data["house"]["house_id"] = $house_id;
+        $data["house"]["house_name"] = $house->house_num;
+        foreach ($contracts as $contract) {
+            $fees = $contract->fees;
+            foreach ($fees as $fee) {
+                $data["fees"][] = [
+                    "resident_name" => $contract->resident?->name,
+                    'periode' => $fee->periode,
+                    'fee_category' => $fee->category->name,
+                    'paid_at' => $fee->paid_at
+                ];
+            }
+        }
+        return response()->json($data);
+    }
 }

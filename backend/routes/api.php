@@ -29,6 +29,7 @@ Route::get('/resident-table', [TableController::class, 'ResidentTable']);
 Route::get('/fee-history-table', [TableController::class, 'FeeHistoryTable']);
 Route::get('/expense-history-table', [TableController::class, 'ExpenseHistoryTable']);
 Route::get('/houses/{id}/residents', [HouseController::class, 'ResidentHistories']);
+Route::get('/houses/{house_id}/payments', [HouseController::class, 'PaymentHistories']);
 
 // GET
 Route::get('/fees/max-months/{houseId}/{category}', [PaymentTransactionController::class, 'getMaxMonths']);

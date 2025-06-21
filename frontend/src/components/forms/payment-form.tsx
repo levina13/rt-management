@@ -18,10 +18,12 @@ import { type FeeCategory, type House } from "@/pages/management/type"
 export default function PaymentForm({
   children,
   onSuccess,
+  houseId,
 }: // id,
 {
   children: React.ReactNode
   onSuccess?: () => void
+  houseId?: string
   // id?: number
 }) {
   const initialForm = {
@@ -39,6 +41,9 @@ export default function PaymentForm({
   useEffect(() => {
     api.get("/houses").then((res) => setHouses(res.data))
     api.get("/fee-categories").then((res) => setCategories(res.data))
+    setForm(
+      houseId == "" ? initialForm : { ...form, house_id: String(houseId) }
+    )
   }, [])
 
   useEffect(() => {
@@ -56,7 +61,7 @@ export default function PaymentForm({
               res.data.max_months || 0
             ),
           }))
-          console.log(res.data.max_months)
+          console.log(maxMonths)
         })
     }
   }, [form.house_id, form.fee_category])
@@ -107,6 +112,7 @@ export default function PaymentForm({
                   <Select
                     value={form.house_id}
                     onValueChange={handleHouseChange}
+                    disabled={houseId == "" ? false : true}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Pilih rumah" />
@@ -151,9 +157,9 @@ export default function PaymentForm({
                       <SelectValue placeholder="Pilih jumlah iuran" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Array.from({ length: maxMonths + 1 }, (_, i) => (
-                        <SelectItem key={i} value={String(i)}>
-                          {i} bulan
+                      {Array.from({ length: maxMonths }, (_, i) => (
+                        <SelectItem key={i} value={String(i + 1)}>
+                          {i + 1} bulan
                         </SelectItem>
                       ))}
                     </SelectContent>

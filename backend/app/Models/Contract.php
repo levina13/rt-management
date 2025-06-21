@@ -40,7 +40,6 @@ class Contract extends Model
         if ($lastPaid && !empty($lastPaid->periode)) {
             $start = Carbon::createFromFormat('Y-m', $lastPaid->periode)->addMonth();
         } else {
-            // Belum pernah bayar, mulai dari awal kontrak
             $start = Carbon::parse($this->start_date)->startOfMonth();
         }
 
@@ -52,8 +51,8 @@ class Contract extends Model
         $start = $this->getLastFeePeriodeByCategory($feeCategory);
 
         $end = $this->end_date
-            ? Carbon::parse($this->end_date)->startOfMonth()
-            : now()->addYear()->startOfMonth();
+            ? Carbon::parse($this->end_date)->endOfMonth()
+            : now()->addYear()->endOfMonth();
 
 
         $diff = $start->diffInMonths($end);

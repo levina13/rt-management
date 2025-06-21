@@ -1,6 +1,5 @@
 import Layout from "@/components/Layout"
 import PaymentForm from "@/components/forms/payment-form"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -11,19 +10,41 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { MessageCircleMore, PlusSquare } from "lucide-react"
+import { api } from "@/lib/axios"
+import { PlusSquare } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
 
 export default function PaymentHistory() {
+  const { houseId } = useParams<{ houseId: string }>()
+  const [payments, setPayments] = useState([])
+  const [disabled, setDisabled] = useState(false)
+  const [house, setHouse] = useState([])
+
+  function fetchPayments() {
+    api
+      .get(`/houses/${houseId}/payments`)
+      .then((res) => {
+        setPayments(res.data.fees)
+        setHouse(res.data.house)
+      })
+      .catch((err) => console.error(err))
+  }
+
+  useEffect(() => {
+    fetchPayments()
+  }, [])
+
   return (
     <>
       <Layout>
         <div className="container">
           <div className="text-center flex items-center text-3xl font-bold">
-            <p>History Pembayaran Rumah ...</p>
+            <p>History Pembayaran Rumah {house["house_name"]}</p>
           </div>
           <div className="mt-5 flex flex-row-reverse">
             <div className="flex flex-row-reverse">
-              <PaymentForm>
+              <PaymentForm houseId={houseId} onSuccess={fetchPayments}>
                 <Button variant={"default"}>
                   <PlusSquare /> Tambah Pembayaran
                 </Button>
@@ -39,30 +60,21 @@ export default function PaymentHistory() {
                   <TableHead>Penghuni</TableHead>
                   <TableHead>Periode</TableHead>
                   <TableHead>Jenis Iuran </TableHead>
-                  <TableHead>Status</TableHead>
                   <TableHead>Tanggal Pembayaran</TableHead>
-                  <TableHead className="text-center">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">1</TableCell>
-                  <TableCell>Arjuna</TableCell>
-                  <TableCell>Januari 2025</TableCell>
-                  <TableCell className="">Iuran Kebersihan</TableCell>
-                  <TableCell>
-                    <Badge>Lunas</Badge>
-                    {/* <Badge variant={"destructive"}>Belum Bayar</Badge> */}
-                  </TableCell>
-                  <TableCell>20 Oktober 2025</TableCell>
-                  <TableCell className="">
-                    <div className="flex justify-center gap-2">
-                      <Button variant={"secondary"}>
-                        <MessageCircleMore /> Chat
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                {payments.map((payment, index) => (
+                  <TableRow>
+                    <TableCell className="font-medium">{index + 1}</TableCell>
+                    <TableCell>{payment["resident_name"]}</TableCell>
+                    <TableCell>{payment["periode"]}</TableCell>
+                    <TableCell className="">
+                      {payment["fee_category"]}
+                    </TableCell>
+                    <TableCell>{payment["paid_at"]}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>
