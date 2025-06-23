@@ -18,7 +18,6 @@ import { useParams } from "react-router-dom"
 export default function PaymentHistory() {
   const { houseId } = useParams<{ houseId: string }>()
   const [payments, setPayments] = useState([])
-  const [disabled, setDisabled] = useState(false)
   const [house, setHouse] = useState([])
 
   function fetchPayments() {
@@ -40,7 +39,7 @@ export default function PaymentHistory() {
       <Layout>
         <div className="container">
           <div className="text-center flex items-center text-3xl font-bold">
-            <p>History Pembayaran Rumah {house["house_name"]}</p>
+            <p>History Pembayaran Rumah {house[0]?.["house_name"]}</p>
           </div>
           <div className="mt-5 flex flex-row-reverse">
             <div className="flex flex-row-reverse">

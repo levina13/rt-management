@@ -24,11 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { type ChartData } from "./management/type"
 import { rupiah } from "@/lib/utils"
 import { api } from "@/lib/axios"
 import { months } from "@/lib/var"
+import { ErrorAlert } from "@/components/error-alert"
 
 function generateYearsBetween(startYear = 2024) {
   const endDate = new Date().getFullYear()
@@ -52,13 +53,16 @@ export default function Dashboard() {
   const [chartData, setChartData] = useState<ChartData[]>([])
   const [cardData, setCardData] = useState(initialCard)
   const [tableData, setTableData] = useState([])
+  const [errors, setErrors] = useState<string[]>([])
   const yearList = generateYearsBetween()
 
   function fetchCardData() {
     api
       .get("/dashboard/card-data")
       .then((res) => setCardData(res.data))
-      .catch((err) => console.error(err))
+      .catch(() => {
+        setErrors(["Gagal mengambil data Pemasukan, Pengeluaran, dan Saldo."])
+      })
   }
 
   function fetchChartData(year: number) {
@@ -67,14 +71,18 @@ export default function Dashboard() {
       .then((res) => {
         setChartData(res.data)
       })
-      .catch((err) => console.error(err))
+      .catch(() => {
+        setErrors((old) => [...old, "Gagal mengambil data untuk chart."])
+      })
   }
 
   function fetchTableData(year: number, month: number) {
     api
       .get(`/dashboard/table-data/${year}/${month}`)
       .then((res) => setTableData(res.data))
-      .catch((err) => console.error(err))
+      .catch(() => {
+        setErrors((old) => [...old, "Gagal mengambil data untuk tabel."])
+      })
   }
 
   useEffect(() => {
@@ -93,7 +101,14 @@ export default function Dashboard() {
     <>
       <Layout>
         <div className="container">
-          <div className=" flex flex-row gap-4 justify-center">
+          {errors.length > 0 && (
+            <ErrorAlert>
+              {errors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ErrorAlert>
+          )}
+          <div className="mt-2 grid grid-cols-2 md:flex gap-2 justify-center">
             <Card className="w-fit">
               <CardContent>
                 <CardDescription className="text-2xl">

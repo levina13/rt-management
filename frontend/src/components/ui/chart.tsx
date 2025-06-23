@@ -233,7 +233,7 @@ function ChartTooltipContent({
                     </div>
                     {item.value && (
                       <span className="text-foreground font-mono font-medium tabular-nums">
-                        {rupiah(item.value)}
+                        {rupiah(parseInt(String(item.value)))}
                       </span>
                     )}
                   </div>

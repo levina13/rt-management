@@ -112,7 +112,7 @@ export default function PaymentForm({
                   <Select
                     value={form.house_id}
                     onValueChange={handleHouseChange}
-                    disabled={houseId == "" ? false : true}
+                    disabled={houseId == undefined ? false : true}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Pilih rumah" />
@@ -168,7 +168,7 @@ export default function PaymentForm({
               </div>
             </div>
 
-            <Button onClick={handleSubmit} className="w-full">
+            <Button onClick={handleSubmit} className="w-full mt-4">
               Simpan
             </Button>
             <Scrollbar />
