@@ -12,16 +12,18 @@ import {
 } from "@/components/ui/table"
 import { api } from "@/lib/axios"
 import { MessageCircleMoreIcon, PlusSquare } from "lucide-react"
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import type { FeeHistoryTable } from "./management/type"
+import { ErrorAlert } from "@/components/error-alert"
 
 export default function Payment() {
   const [fees, setfees] = useState([])
+  const [errors, setErrors] = useState<string[]>([])
   function fetchFees() {
     api
       .get("/fee-history-table")
       .then((res) => setfees(res.data))
-      .catch((err) => console.error(err))
+      .catch(() => setErrors(["Gagal mengambil data untuk tabel."]))
   }
   useEffect(() => {
     fetchFees()
@@ -41,7 +43,14 @@ export default function Payment() {
             </PaymentForm>
           </div>
         </div>
-        <div>
+        {errors.length > 0 && (
+          <ErrorAlert>
+            {errors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ErrorAlert>
+        )}
+        <div className="mt-4">
           <Table>
             <TableCaption>Daftar Iuran</TableCaption>
             <TableHeader>

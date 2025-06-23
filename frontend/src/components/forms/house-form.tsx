@@ -11,6 +11,8 @@ import { Label } from "../ui/label"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 import { api } from "@/lib/axios"
+import { isAxiosError } from "axios"
+import { ErrorAlert } from "../error-alert"
 
 export default function HouseForm({
   children,
@@ -26,15 +28,12 @@ export default function HouseForm({
   }
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState(initialForm)
-
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const isEditing = !!id
 
   useEffect(() => {
     if (isEditing && open) {
-      api
-        .get(`/houses/${id}`)
-        .then((res) => setForm(res.data))
-        .catch((err) => console.error("Failed to fetch house", err))
+      api.get(`/houses/${id}`).then((res) => setForm(res.data))
     } else if (!isEditing) {
       setForm(initialForm)
     }
@@ -52,8 +51,12 @@ export default function HouseForm({
       }
       onSuccess?.()
       setOpen(false)
+      setForm(initialForm)
+      setErrors({})
     } catch (err) {
-      console.error("Submit failed", err)
+      if (isAxiosError(err)) {
+        setErrors(err.response?.data?.errors)
+      }
     }
   }
   return (
@@ -63,10 +66,21 @@ export default function HouseForm({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{isEditing ? "Edit" : "Tambah"} Rumah</DialogTitle>
+            <div className="flex w-full">
+              {Object.keys(errors).length > 0 ? (
+                <ErrorAlert>
+                  {errors["house_num"] != undefined && (
+                    <li>{errors["house_num"]}</li>
+                  )}
+                </ErrorAlert>
+              ) : (
+                <></>
+              )}
+            </div>
           </DialogHeader>
 
           <div className="flex flex-col gap-2 w-full max-w-full">
-            <div className="grid w-full max-w-sm items-center gap-3">
+            <div className="grid w-full items-center gap-3">
               <Label htmlFor="house_num">Nomor Rumah</Label>
               <Input
                 id="house_num"

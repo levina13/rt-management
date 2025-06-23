@@ -20,6 +20,8 @@ import { Button } from "../ui/button"
 import { api } from "@/lib/axios"
 import { format } from "date-fns"
 import { useParams } from "react-router-dom"
+import { isAxiosError } from "axios"
+import { ErrorAlert } from "../error-alert"
 
 export default function ContractForm({
   children,
@@ -40,6 +42,7 @@ export default function ContractForm({
   const [endDate, setEndDate] = useState<Date>()
   const [residentList, setResidentList] = useState([])
   const categoryList = ["kontrak", "permanen"]
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   function fetchResident() {
     api
@@ -60,6 +63,7 @@ export default function ContractForm({
     setResident("1")
     setCategory("kontrak")
     setStartDate(undefined)
+    setErrors({})
   }
 
   useEffect(() => {
@@ -95,8 +99,10 @@ export default function ContractForm({
       onSuccess?.()
       setOpen(false)
       emptyForm()
-    } catch (error) {
-      console.error("Submit failed", error)
+    } catch (err) {
+      if (isAxiosError(err)) {
+        setErrors(err.response?.data?.errors)
+      }
     }
   }
   return (
@@ -105,6 +111,29 @@ export default function ContractForm({
       <DialogContent className="md:max-w-[30vw] max-h-[80vh]">
         <DialogHeader className="text-center items-center mb-3">
           <div className="text-2xl font-bold">Tambah Penghuni</div>
+          <div className="flex w-full">
+            {Object.keys(errors).length > 0 ? (
+              <ErrorAlert>
+                {errors["resident_id"] != undefined && (
+                  <li>{errors["resident_id"]}</li>
+                )}
+                {errors["contract_category"] != undefined && (
+                  <li>{errors["contract_category"]}</li>
+                )}
+                {errors["start_date"] != undefined && (
+                  <li>{errors["start_date"]}</li>
+                )}
+                {errors["end_date"] != undefined && (
+                  <li>{errors["end_date"]}</li>
+                )}
+                {errors["house_id"] != undefined && (
+                  <li>{errors["house_id"]}</li>
+                )}
+              </ErrorAlert>
+            ) : (
+              <></>
+            )}
+          </div>
         </DialogHeader>
         <ScrollArea className="max-h-[60vh]">
           <div className="flex flex-col">

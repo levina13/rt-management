@@ -12,8 +12,13 @@ class ExpenseTransactionController extends Controller
     {
         $validated = $request->validate([
             'expense_category' => 'required',
-            'description' => 'required|string',
+            'description' => 'required',
             'amount' => 'required',
+        ], [
+            'expense_category.required' => 'Pilih Kategori pengeluaran.',
+            'description.required' => 'Deskripsi pengeluaran harus diisi.',
+            'amount.required' => 'Jumlah pengeluaran harus diisi.',
+
         ]);
 
         $insertData = [

@@ -13,7 +13,7 @@ class HouseController extends Controller
      */
     public function index()
     {
-        $houses = House::all();
+        $houses = House::orderBy('id')->get();
 
 
         return response()->json($houses);
@@ -24,9 +24,13 @@ class HouseController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'house_num' => 'required|string|max:10',
-        ]);
+        $data = $request->validate(
+            [
+                'house_num' => 'required',
+            ],
+            ['house_num.required' => "nama rumah harus diisi"]
+        );
+
 
         $house = House::create($data);
         return response()->json($house, 201);
@@ -101,6 +105,11 @@ class HouseController extends Controller
             'resident_id' => 'required',
             'contract_category' => 'required',
             'start_date' => 'required'
+        ], [
+            'resident_id.required' => 'Harus pilih warga yang akan menghuni.',
+            'contract_category.required' => 'Harus pilih kategori kontrak rumah.',
+            'start_date.required' => 'Harus pilih tanggal mulai kontrak.'
+
         ]);
         $data["end_date"] = $request["end_date"];
         $data["house_id"] = $house_id;
@@ -114,10 +123,17 @@ class HouseController extends Controller
     {
         $house = House::find($house_id);
 
+        $current_contract = $house->currentContract;
+        $feeSatpam = $current_contract->getFeeStatusByCategory(1);
+        $feeKebersihan = $current_contract->getFeeStatusByCategory(2);
+
+
+
         $contracts = $house->contracts;
         $data = [];
         $data["house"]["house_id"] = $house_id;
         $data["house"]["house_name"] = $house->house_num;
+        $data["house"]["is_paid"] = $feeKebersihan & $feeSatpam;
         foreach ($contracts as $contract) {
             $fees = $contract->fees;
             foreach ($fees as $fee) {

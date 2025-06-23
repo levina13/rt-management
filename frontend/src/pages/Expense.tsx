@@ -16,15 +16,17 @@ import { PlusSquare } from "lucide-react"
 import { useEffect, useState } from "react"
 import type { ExpenseHistoryTable } from "./management/type"
 import { rupiah } from "@/lib/utils"
+import { ErrorAlert } from "@/components/error-alert"
 
 export default function Expense() {
   const [expenses, setExpenses] = useState([])
+  const [errors, setErrors] = useState<string[]>([])
 
   function fetchExpenses() {
     api
       .get("/expense-history-table")
       .then((res) => setExpenses(res.data))
-      .catch((err) => console.error(err))
+      .catch(() => setErrors(["Gagal mengambil data untuk tabel."]))
   }
   useEffect(() => {
     fetchExpenses()
@@ -39,14 +41,21 @@ export default function Expense() {
           </div>
           <div className="mt-5 flex flex-row-reverse">
             <div className="flex flex-row-reverse">
-              <ExpenseForm>
+              <ExpenseForm onSuccess={fetchExpenses}>
                 <Button variant={"default"}>
                   <PlusSquare /> Tambah Pengeluaran
                 </Button>
               </ExpenseForm>
             </div>
           </div>
-          <div>
+          {errors.length > 0 && (
+            <ErrorAlert>
+              {errors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ErrorAlert>
+          )}
+          <div className="mt-5">
             <Table>
               <TableCaption>Daftar Pengeluaran di RT..</TableCaption>
               <TableHeader>

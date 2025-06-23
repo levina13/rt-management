@@ -28,6 +28,14 @@ class ResidentController extends Controller
             'phone' => 'required|string|max:20',
             'is_married' => 'required|boolean',
             'ktp' => 'required|string|max:255', // jika pakai upload file
+        ], [
+            "name.required" => "Nama harus diisi.",
+            "name.max" => "Nama terlalu panjang.",
+            "phone.required" => "Nomor Telepon harus diisi",
+            "phone.max" => "Nomor telepon terlalu panjang.",
+            "is_married.required" => "Status Pernikahan harus diisi",
+            "ktp.required" => "KTP harus diisi."
+
         ]);
 
         // Simpan data

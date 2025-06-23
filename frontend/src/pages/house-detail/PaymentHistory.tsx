@@ -1,4 +1,5 @@
 import Layout from "@/components/Layout"
+import { ErrorAlert } from "@/components/error-alert"
 import PaymentForm from "@/components/forms/payment-form"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,6 +20,8 @@ export default function PaymentHistory() {
   const { houseId } = useParams<{ houseId: string }>()
   const [payments, setPayments] = useState([])
   const [house, setHouse] = useState([])
+  const [errors, setErrors] = useState<string[]>([])
+  const [paidStatus, setPaidStatus] = useState(false)
 
   function fetchPayments() {
     api
@@ -26,8 +29,9 @@ export default function PaymentHistory() {
       .then((res) => {
         setPayments(res.data.fees)
         setHouse(res.data.house)
+        setPaidStatus(res.data.house.is_paid)
       })
-      .catch((err) => console.error(err))
+      .catch(() => setErrors(["Gagal mengambil data untuk tabel."]))
   }
 
   useEffect(() => {
@@ -44,13 +48,20 @@ export default function PaymentHistory() {
           <div className="mt-5 flex flex-row-reverse">
             <div className="flex flex-row-reverse">
               <PaymentForm houseId={houseId} onSuccess={fetchPayments}>
-                <Button variant={"default"}>
+                <Button variant={"default"} disabled={paidStatus}>
                   <PlusSquare /> Tambah Pembayaran
                 </Button>
               </PaymentForm>
             </div>
           </div>
-          <div>
+          {errors.length > 0 && (
+            <ErrorAlert>
+              {errors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ErrorAlert>
+          )}
+          <div className="mt-4">
             <Table>
               <TableCaption>Daftar pembayaran rumah ...</TableCaption>
               <TableHeader>

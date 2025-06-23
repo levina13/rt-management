@@ -26,11 +26,18 @@ class PaymentTransactionController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'house_id' => 'required',
-            'fee_category' => 'required',
-            'fee_count' => 'required',
-        ]);
+        $validated = $request->validate(
+            [
+                'house_id' => 'required',
+                'fee_category' => 'required',
+                'fee_count' => 'required',
+            ],
+            [
+                'house_id.required' => 'Rumah harus dipilih.',
+                'fee_category.required' => 'Kategori iuran harus dipilih.',
+                'fee_count.required' => 'Pilih jumlah bulan yang telah disediakan.',
+            ]
+        );
         $fee_count = $validated['fee_count'];
         $contract = Contract::where('house_id', $validated['house_id'])->active()->first();
         $fee_category = $validated['fee_category'];

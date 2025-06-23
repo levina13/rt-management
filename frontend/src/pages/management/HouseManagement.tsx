@@ -21,14 +21,17 @@ import {
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import type { HouseTable } from "./type"
+import { ErrorAlert } from "@/components/error-alert"
 
 export default function HouseManagement() {
   const [houses, setHouses] = useState([])
+  const [errors, setErrors] = useState<string[]>([])
+
   function fetchHouses() {
     api
       .get("/house-table")
       .then((res) => setHouses(res.data))
-      .catch((err) => console.error(err))
+      .catch(() => setErrors(["Gagal mengambil data untuk tabel."]))
   }
   useEffect(() => {
     fetchHouses()
@@ -49,7 +52,14 @@ export default function HouseManagement() {
             </HouseForm>
           </div>
         </div>
-        <div>
+        {errors.length > 0 && (
+          <ErrorAlert>
+            {errors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ErrorAlert>
+        )}
+        <div className="mt-4">
           <Table>
             <TableCaption>Daftar Rumah di RT..</TableCaption>
             <TableHeader>

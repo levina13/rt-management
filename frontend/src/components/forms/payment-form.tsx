@@ -14,17 +14,17 @@ import { ScrollArea } from "../ui/scroll-area"
 import { Scrollbar } from "@radix-ui/react-scroll-area"
 import { api } from "@/lib/axios"
 import { type FeeCategory, type House } from "@/pages/management/type"
+import { isAxiosError } from "axios"
+import { ErrorAlert } from "../error-alert"
 
 export default function PaymentForm({
   children,
   onSuccess,
   houseId,
-}: // id,
-{
+}: {
   children: React.ReactNode
   onSuccess?: () => void
   houseId?: string
-  // id?: number
 }) {
   const initialForm = {
     house_id: "",
@@ -36,6 +36,7 @@ export default function PaymentForm({
   const [maxMonths, setMaxMonths] = useState(0)
   const [houses, setHouses] = useState<House[]>([])
   const [categories, setCategories] = useState<FeeCategory[]>([])
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Fetch rumah (yang tidak kosong)
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function PaymentForm({
     setForm(
       houseId == "" ? initialForm : { ...form, house_id: String(houseId) }
     )
-  }, [])
+  }, [open])
 
   useEffect(() => {
     if (form.house_id && form.fee_category) {
@@ -61,7 +62,6 @@ export default function PaymentForm({
               res.data.max_months || 0
             ),
           }))
-          console.log(maxMonths)
         })
     }
   }, [form.house_id, form.fee_category])
@@ -92,8 +92,12 @@ export default function PaymentForm({
 
       onSuccess?.()
       setOpen(false)
+      setForm(initialForm)
+      setErrors({})
     } catch (err) {
-      console.error("Submit failed", err)
+      if (isAxiosError(err)) {
+        setErrors(err.response?.data?.errors)
+      }
     }
   }
   return (
@@ -103,6 +107,23 @@ export default function PaymentForm({
         <DialogContent className="md:max-w-[70vw] max-h-[80vh] w-fit ">
           <DialogHeader className="text-center items-center mb-3">
             <div className="text-2xl font-bold">Konfirmasi Pembayaran</div>
+            <div className="flex w-full">
+              {Object.keys(errors).length > 0 ? (
+                <ErrorAlert>
+                  {errors["house_id"] != undefined && (
+                    <li>{errors["house_id"]}</li>
+                  )}
+                  {errors["fee_category"] != undefined && (
+                    <li>{errors["fee_category"]}</li>
+                  )}
+                  {errors["fee_count"] != undefined && (
+                    <li>{errors["fee_count"]}</li>
+                  )}
+                </ErrorAlert>
+              ) : (
+                <></>
+              )}
+            </div>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh] ">
             <div className="flex flex-col gap-1">

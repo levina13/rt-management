@@ -14,6 +14,8 @@ import {
 import { ScrollArea } from "../ui/scroll-area"
 import { Scrollbar } from "@radix-ui/react-scroll-area"
 import { api } from "@/lib/axios"
+import { isAxiosError } from "axios"
+import { ErrorAlert } from "../error-alert"
 
 export default function ResidentForm({
   children,
@@ -36,6 +38,8 @@ export default function ResidentForm({
   const [open, setOpen] = useState(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
   useEffect(() => {
     if (isEditing && open) {
       api
@@ -96,8 +100,13 @@ export default function ResidentForm({
       }
       onSuccess?.()
       setOpen(false)
-    } catch (error) {
-      console.error("Submit failed", error)
+      setForm(initialForm)
+      setErrors({})
+      setImagePreview("")
+    } catch (err) {
+      if (isAxiosError(err)) {
+        setErrors(err.response?.data?.errors)
+      }
     }
   }
 
@@ -105,10 +114,24 @@ export default function ResidentForm({
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{children}</DialogTrigger>
-        <DialogContent className="md:max-w-[70vw] w-fit max-h-[80vh]">
+        <DialogContent className="md:max-w-[70vw] w-fit max-h-[90vh]">
           <DialogHeader className="text-center items-center mb-3">
             <div className="text-2xl font-bold">
               {isEditing ? "Edit" : "Tambah"} Warga
+            </div>
+            <div className="flex w-full">
+              {Object.keys(errors).length > 0 ? (
+                <ErrorAlert>
+                  {errors["name"] != undefined && <li>{errors["name"]}</li>}
+                  {errors["phone"] != undefined && <li>{errors["phone"]}</li>}
+                  {errors["is_married"] != undefined && (
+                    <li>{errors["is_married"]}</li>
+                  )}
+                  {errors["ktp"] != undefined && <li>{errors["ktp"]}</li>}
+                </ErrorAlert>
+              ) : (
+                <></>
+              )}
             </div>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh]">
@@ -168,7 +191,7 @@ export default function ResidentForm({
               </div>
             </div>
 
-            <Button onClick={handleSubmit} className="w-full">
+            <Button onClick={handleSubmit} className="w-full mt-4">
               Simpan
             </Button>
             <Scrollbar />

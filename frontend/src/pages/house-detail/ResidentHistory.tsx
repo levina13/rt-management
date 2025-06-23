@@ -1,3 +1,4 @@
+import { ErrorAlert } from "@/components/error-alert"
 import ContractForm from "@/components/forms/contract-form"
 import Layout from "@/components/Layout"
 import { Badge } from "@/components/ui/badge"
@@ -20,6 +21,7 @@ export default function ResidentHistory() {
   const { houseId } = useParams<{ houseId: string }>()
   const [residents, setResidents] = useState([])
   const [disabled, setDisabled] = useState(false)
+  const [errors, setErrors] = useState<string[]>([])
 
   function fetchResidents() {
     api
@@ -28,7 +30,7 @@ export default function ResidentHistory() {
         setResidents(res.data.residents)
         setDisabled(res.data.current_contract === "permanen" ? true : false)
       })
-      .catch((err) => console.error(err))
+      .catch(() => setErrors(["Gagal mengambil data untuk tabel."]))
   }
 
   useEffect(() => {
@@ -51,7 +53,14 @@ export default function ResidentHistory() {
               </ContractForm>
             </div>
           </div>
-          <div>
+          {errors.length > 0 && (
+            <ErrorAlert>
+              {errors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ErrorAlert>
+          )}
+          <div className="mt-4">
             <Table>
               <TableCaption>Daftar penghuni rumah ...</TableCaption>
               <TableHeader>

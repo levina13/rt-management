@@ -20,6 +20,8 @@ import { Button } from "../ui/button"
 import { ScrollBar } from "../ui/scroll-area"
 import { type ExpenseCategory } from "../../pages/management/type"
 import { api } from "@/lib/axios"
+import { isAxiosError } from "axios"
+import { ErrorAlert } from "../error-alert"
 
 export default function ExpenseForm({
   children,
@@ -28,27 +30,36 @@ export default function ExpenseForm({
   children: React.ReactNode
   onSuccess?: () => void
 }) {
-  const initialForm = {
-    expense_category: "",
-    description: "",
-    amount: "",
-  }
-  const [form, setForm] = useState(initialForm)
+  const [category, setCategory] = useState("")
+  const [description, setDescription] = useState("")
+  const [amount, setAmount] = useState("")
   const [open, setOpen] = useState(false)
   const [expenseCategories, setExpenseCategories] = useState<ExpenseCategory[]>(
     []
   )
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  function emptyForm() {
+    setErrors({})
+    setCategory("")
+    setDescription("")
+    setAmount("")
+  }
 
   useEffect(() => {
     api.get("/expense-categories").then((res) => setExpenseCategories(res.data))
-  })
+  }, [])
 
   const handleCategoryChange = (value: string) => {
-    setForm({ ...form, expense_category: value })
+    setCategory(value)
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDescription(e.target.value)
+  }
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(e.target.value)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,16 +67,19 @@ export default function ExpenseForm({
 
     try {
       const payload = {
-        ...form,
-        expense_category: parseInt(form.expense_category),
-        amount: parseInt(form.amount),
+        description: description,
+        expense_category: parseInt(category),
+        amount: parseInt(amount),
       }
 
       await api.post("/expenses", payload)
       onSuccess?.()
       setOpen(false)
-    } catch (error) {
-      console.error("submit failed", error)
+      emptyForm()
+    } catch (err) {
+      if (isAxiosError(err)) {
+        setErrors(err.response?.data?.errors)
+      }
     }
   }
   return (
@@ -75,15 +89,27 @@ export default function ExpenseForm({
         <DialogContent className=" max-h-[80vh]">
           <DialogHeader className="text-center items-center mb-3">
             <div className="text-2xl font-bold">Tambah Pengeluaran</div>
+            <div className="flex w-full">
+              {Object.keys(errors).length > 0 ? (
+                <ErrorAlert>
+                  {errors["description"] != undefined && (
+                    <li>{errors["description"]}</li>
+                  )}
+                  {errors["expense_category"] != undefined && (
+                    <li>{errors["expense_category"]}</li>
+                  )}
+                  {errors["amount"] != undefined && <li>{errors["amount"]}</li>}
+                </ErrorAlert>
+              ) : (
+                <></>
+              )}
+            </div>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh]">
             <div className="flex flex-col gap-2 w-full max-w-full">
-              <div className="grid w-full max-w-sm items-center gap-3">
+              <div className="grid w-full items-center gap-3">
                 <Label htmlFor="category">Jenis Pengeluaran</Label>
-                <Select
-                  value={form.expense_category}
-                  onValueChange={handleCategoryChange}
-                >
+                <Select value={category} onValueChange={handleCategoryChange}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Pilih Pengeluaran" />
                   </SelectTrigger>
@@ -99,27 +125,28 @@ export default function ExpenseForm({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid w-full max-w-sm items-center gap-3">
+              <div className="grid w-full items-center gap-3">
                 <Label htmlFor="description">Deskripsi</Label>
                 <Input
                   id="description"
                   name="description"
-                  value={form.description}
-                  onChange={handleChange}
+                  value={description}
+                  onChange={handleDescriptionChange}
                 />
               </div>
-              <div className="grid w-full max-w-sm items-center gap-3">
+              <div className="grid w-full items-center gap-3">
                 <Label htmlFor="amount">Jumlah</Label>
                 <Input
                   id="amount"
                   name="amount"
-                  value={form.amount}
-                  onChange={handleChange}
+                  value={amount}
+                  onChange={handleAmountChange}
+                  type="number"
                 />
               </div>
             </div>
 
-            <Button onClick={handleSubmit} className="w-full">
+            <Button onClick={handleSubmit} className="w-full mt-4">
               Simpan
             </Button>
             <ScrollBar />

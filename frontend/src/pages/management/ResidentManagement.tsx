@@ -16,14 +16,17 @@ import { api } from "@/lib/axios"
 import { Edit, MessageCircleMoreIcon, PlusSquare } from "lucide-react"
 import { useEffect, useState } from "react"
 import type { ResidentTable } from "./type"
+import { ErrorAlert } from "@/components/error-alert"
 
 export default function ResidentManagement() {
   const [residents, setResidents] = useState([])
+  const [errors, setErrors] = useState<string[]>([])
+
   function fetchResident() {
     api
       .get("/resident-table")
       .then((res) => setResidents(res.data))
-      .catch((err) => console.error(err))
+      .catch(() => setErrors(["Gagal mengambil data untuk tabel."]))
   }
   useEffect(() => {
     fetchResident()
@@ -43,7 +46,14 @@ export default function ResidentManagement() {
             </ResidentForm>
           </div>
         </div>
-        <div>
+        {errors.length > 0 && (
+          <ErrorAlert>
+            {errors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ErrorAlert>
+        )}
+        <div className="mt-4">
           <Table>
             <TableCaption>Daftar warga RT.</TableCaption>
             <TableHeader>
