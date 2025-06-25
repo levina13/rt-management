@@ -17,6 +17,7 @@ import { useEffect, useState } from "react"
 import type { ExpenseHistoryTable } from "./management/type"
 import { rupiah } from "@/lib/utils"
 import { ErrorAlert } from "@/components/error-alert"
+import DynamicBreadcrumb from "@/components/breadcrumb"
 
 export default function Expense() {
   const [expenses, setExpenses] = useState([])
@@ -39,14 +40,13 @@ export default function Expense() {
           <div className="text-center flex items-center text-3xl font-bold">
             <p>Manajemen Pengeluaran</p>
           </div>
-          <div className="mt-5 flex flex-row-reverse">
-            <div className="flex flex-row-reverse">
-              <ExpenseForm onSuccess={fetchExpenses}>
-                <Button variant={"default"}>
-                  <PlusSquare /> Tambah Pengeluaran
-                </Button>
-              </ExpenseForm>
-            </div>
+          <div className="mt-5 flex flex-row-reverse justify-between">
+            <ExpenseForm onSuccess={fetchExpenses}>
+              <Button variant={"default"}>
+                <PlusSquare /> Tambah Pengeluaran
+              </Button>
+            </ExpenseForm>
+            <DynamicBreadcrumb />
           </div>
           {errors.length > 0 && (
             <ErrorAlert>

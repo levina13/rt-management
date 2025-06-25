@@ -1,6 +1,7 @@
 import Layout from "@/components/Layout"
 import { ErrorAlert } from "@/components/error-alert"
 import PaymentForm from "@/components/forms/payment-form"
+import DynamicBreadcrumb from "@/components/breadcrumb"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -52,6 +53,7 @@ export default function PaymentHistory() {
                   <PlusSquare /> Tambah Pembayaran
                 </Button>
               </PaymentForm>
+              <DynamicBreadcrumb />
             </div>
           </div>
           {errors.length > 0 && (

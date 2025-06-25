@@ -15,6 +15,7 @@ import { MessageCircleMoreIcon, PlusSquare } from "lucide-react"
 import { useEffect, useState } from "react"
 import type { FeeHistoryTable } from "./management/type"
 import { ErrorAlert } from "@/components/error-alert"
+import DynamicBreadcrumb from "@/components/breadcrumb"
 
 export default function Payment() {
   const [fees, setfees] = useState([])
@@ -34,14 +35,13 @@ export default function Payment() {
         <div className="text-center flex items-center text-3xl font-bold">
           <p>Histori Iuran</p>
         </div>
-        <div className="mt-5 flex flex-row-reverse flex-between">
-          <div className="flex flex-row-reverse">
-            <PaymentForm onSuccess={fetchFees}>
-              <Button variant={"default"}>
-                <PlusSquare /> Tambah Pembayaran
-              </Button>
-            </PaymentForm>
-          </div>
+        <div className="mt-5 flex flex-row-reverse justify-between">
+          <PaymentForm onSuccess={fetchFees}>
+            <Button variant={"default"}>
+              <PlusSquare /> Tambah Pembayaran
+            </Button>
+          </PaymentForm>
+          <DynamicBreadcrumb />
         </div>
         {errors.length > 0 && (
           <ErrorAlert>

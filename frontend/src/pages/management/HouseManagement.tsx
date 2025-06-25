@@ -22,6 +22,7 @@ import {
 import { useEffect, useState } from "react"
 import type { HouseTable } from "./type"
 import { ErrorAlert } from "@/components/error-alert"
+import DynamicBreadcrumb from "@/components/breadcrumb"
 
 export default function HouseManagement() {
   const [houses, setHouses] = useState([])
@@ -43,14 +44,13 @@ export default function HouseManagement() {
         <div className="text-center flex items-center text-3xl font-bold">
           <p>Manajemen Rumah</p>
         </div>
-        <div className="mt-5 flex flex-row-reverse">
-          <div className="flex flex-row-reverse">
-            <HouseForm onSuccess={fetchHouses}>
-              <Button variant={"default"}>
-                <PlusSquare /> Tambah Rumah
-              </Button>
-            </HouseForm>
-          </div>
+        <div className="mt-5 flex flex-row-reverse justify-between">
+          <HouseForm onSuccess={fetchHouses}>
+            <Button variant={"default"}>
+              <PlusSquare /> Tambah Rumah
+            </Button>
+          </HouseForm>
+          <DynamicBreadcrumb />
         </div>
         {errors.length > 0 && (
           <ErrorAlert>

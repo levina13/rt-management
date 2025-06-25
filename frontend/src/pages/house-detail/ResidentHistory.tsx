@@ -1,5 +1,6 @@
 import { ErrorAlert } from "@/components/error-alert"
 import ContractForm from "@/components/forms/contract-form"
+import DynamicBreadcrumb from "@/components/breadcrumb"
 import Layout from "@/components/Layout"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -44,14 +45,13 @@ export default function ResidentHistory() {
           <div className="text-center flex items-center text-3xl font-bold">
             <p>History Penghuni Rumah ...</p>
           </div>
-          <div className="mt-5 flex flex-row-reverse">
-            <div className="flex flex-row-reverse">
-              <ContractForm onSuccess={fetchResidents}>
-                <Button variant={"default"} disabled={disabled}>
-                  <PlusSquare /> Tambah Penghuni
-                </Button>
-              </ContractForm>
-            </div>
+          <div className="mt-5 flex flex-row-reverse justify-between">
+            <ContractForm onSuccess={fetchResidents}>
+              <Button variant={"default"} disabled={disabled}>
+                <PlusSquare /> Tambah Penghuni
+              </Button>
+            </ContractForm>
+            <DynamicBreadcrumb />
           </div>
           {errors.length > 0 && (
             <ErrorAlert>

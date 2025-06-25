@@ -17,6 +17,7 @@ import { Edit, MessageCircleMoreIcon, PlusSquare } from "lucide-react"
 import { useEffect, useState } from "react"
 import type { ResidentTable } from "./type"
 import { ErrorAlert } from "@/components/error-alert"
+import DynamicBreadcrumb from "@/components/breadcrumb"
 
 export default function ResidentManagement() {
   const [residents, setResidents] = useState([])
@@ -37,14 +38,13 @@ export default function ResidentManagement() {
         <div className="text-center flex items-center text-3xl font-bold">
           <p>Manajemen Warga</p>
         </div>
-        <div className="mt-5 flex flex-row-reverse">
-          <div className="flex flex-row-reverse">
-            <ResidentForm onSuccess={fetchResident}>
-              <Button variant={"default"}>
-                <PlusSquare /> Tambah Warga
-              </Button>
-            </ResidentForm>
-          </div>
+        <div className="mt-5 flex flex-row-reverse justify-between">
+          <ResidentForm onSuccess={fetchResident}>
+            <Button variant={"default"}>
+              <PlusSquare /> Tambah Warga
+            </Button>
+          </ResidentForm>
+          <DynamicBreadcrumb />
         </div>
         {errors.length > 0 && (
           <ErrorAlert>
