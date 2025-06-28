@@ -103,10 +103,12 @@ export default function ResidentForm({
       setForm(initialForm)
       setErrors({})
       setImagePreview("")
+      console.log("aman")
     } catch (err) {
       if (isAxiosError(err)) {
         setErrors(err.response?.data?.errors)
       }
+      console.log(err)
     }
   }
 

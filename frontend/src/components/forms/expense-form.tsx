@@ -18,7 +18,7 @@ import {
 import { useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import { ScrollBar } from "../ui/scroll-area"
-import { type ExpenseCategory } from "../../pages/management/type"
+import { type ExpenseCategory } from "../../lib/type"
 import { api } from "@/lib/axios"
 import { isAxiosError } from "axios"
 import { ErrorAlert } from "../error-alert"

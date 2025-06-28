@@ -1,6 +1,5 @@
 import { AnnualChart } from "@/components/annual-chart"
 import Layout from "@/components/Layout"
-import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardContent,
@@ -9,15 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -25,11 +15,14 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useEffect, useState } from "react"
-import { type ChartData } from "./management/type"
+import { type ChartData, type Search } from "../lib/type"
 import { rupiah } from "@/lib/utils"
 import { api } from "@/lib/axios"
 import { months } from "@/lib/var"
 import { ErrorAlert } from "@/components/error-alert"
+import DataTable from "@/components/data-table"
+import { TransactionColumn } from "@/lib/column"
+import { Input } from "@/components/ui/input"
 
 function generateYearsBetween(startYear = 2024) {
   const endDate = new Date().getFullYear()
@@ -54,6 +47,7 @@ export default function Dashboard() {
   const [cardData, setCardData] = useState(initialCard)
   const [tableData, setTableData] = useState([])
   const [errors, setErrors] = useState<string[]>([])
+  const [search, setSearch] = useState<Search>()
   const yearList = generateYearsBetween()
 
   function fetchCardData() {
@@ -108,7 +102,7 @@ export default function Dashboard() {
               ))}
             </ErrorAlert>
           )}
-          <div className="mt-2 grid grid-cols-2 md:flex gap-2 justify-center">
+          <div className="mt-2 flex flex-wrap gap-2 justify-center ">
             <Card className="w-fit">
               <CardContent>
                 <CardDescription className="text-2xl">
@@ -181,36 +175,20 @@ export default function Dashboard() {
                   </SelectContent>
                 </Select>
               </CardHeader>
-              <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-                <Table>
-                  <TableCaption>Daftar Transaksi</TableCaption>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[30px]">No.</TableHead>
-                      <TableHead>Nama</TableHead>
-                      <TableHead>Tanggal</TableHead>
-                      <TableHead>Jenis</TableHead>
-                      <TableHead>Jumlah</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {tableData.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>{row["name"]}</TableCell>
-                        <TableCell>{row["date"]}</TableCell>
-                        <TableCell>
-                          {row["type"] == "Pemasukan" ? (
-                            <Badge>Pemasukan</Badge>
-                          ) : (
-                            <Badge variant={"destructive"}>Pengeluaran</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>{row["amount"]}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <CardContent className="px-2 sm:px-2">
+                <Input
+                  placeholder="Cari transaksi..."
+                  value={search?.value}
+                  onChange={(event) =>
+                    setSearch({ label: "name", value: event.target.value })
+                  }
+                  className="max-w-sm mb-2"
+                />
+                <DataTable
+                  columns={TransactionColumn}
+                  data={tableData}
+                  search={search}
+                />
               </CardContent>
             </Card>
           </div>

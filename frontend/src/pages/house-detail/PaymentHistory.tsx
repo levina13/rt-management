@@ -3,19 +3,12 @@ import { ErrorAlert } from "@/components/error-alert"
 import PaymentForm from "@/components/forms/payment-form"
 import DynamicBreadcrumb from "@/components/breadcrumb"
 import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { api } from "@/lib/axios"
 import { PlusSquare } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
+import DataTable from "@/components/data-table"
+import { PaymentHistoryColumn } from "@/lib/column"
 
 export default function PaymentHistory() {
   const { houseId } = useParams<{ houseId: string }>()
@@ -46,15 +39,13 @@ export default function PaymentHistory() {
           <div className="text-center flex items-center text-3xl font-bold">
             <p>History Pembayaran Rumah {house[0]?.["house_name"]}</p>
           </div>
-          <div className="mt-5 flex flex-row-reverse">
-            <div className="flex flex-row-reverse">
-              <PaymentForm houseId={houseId} onSuccess={fetchPayments}>
-                <Button variant={"default"} disabled={paidStatus}>
-                  <PlusSquare /> Tambah Pembayaran
-                </Button>
-              </PaymentForm>
-              <DynamicBreadcrumb />
-            </div>
+          <div className="mt-5 flex flex-row-reverse justify-between">
+            <PaymentForm houseId={houseId} onSuccess={fetchPayments}>
+              <Button variant={"default"} disabled={paidStatus}>
+                <PlusSquare /> Tambah Pembayaran
+              </Button>
+            </PaymentForm>
+            <DynamicBreadcrumb />
           </div>
           {errors.length > 0 && (
             <ErrorAlert>
@@ -64,31 +55,7 @@ export default function PaymentHistory() {
             </ErrorAlert>
           )}
           <div className="mt-4">
-            <Table>
-              <TableCaption>Daftar pembayaran rumah ...</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[30px]">No.</TableHead>
-                  <TableHead>Penghuni</TableHead>
-                  <TableHead>Periode</TableHead>
-                  <TableHead>Jenis Iuran </TableHead>
-                  <TableHead>Tanggal Pembayaran</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {payments.map((payment, index) => (
-                  <TableRow>
-                    <TableCell className="font-medium">{index + 1}</TableCell>
-                    <TableCell>{payment["resident_name"]}</TableCell>
-                    <TableCell>{payment["periode"]}</TableCell>
-                    <TableCell className="">
-                      {payment["fee_category"]}
-                    </TableCell>
-                    <TableCell>{payment["paid_at"]}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <DataTable data={payments} columns={PaymentHistoryColumn} />
           </div>
         </div>
       </Layout>

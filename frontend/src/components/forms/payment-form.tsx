@@ -13,7 +13,7 @@ import {
 import { ScrollArea } from "../ui/scroll-area"
 import { Scrollbar } from "@radix-ui/react-scroll-area"
 import { api } from "@/lib/axios"
-import { type FeeCategory, type House } from "@/pages/management/type"
+import { type FeeCategory, type House } from "@/lib/type"
 import { isAxiosError } from "axios"
 import { ErrorAlert } from "../error-alert"
 

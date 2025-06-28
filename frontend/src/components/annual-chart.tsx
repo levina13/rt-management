@@ -12,7 +12,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import type { ChartData } from "@/pages/management/type"
+import type { ChartData } from "@/lib/type"
 
 export const description = "An interactive area chart"
 

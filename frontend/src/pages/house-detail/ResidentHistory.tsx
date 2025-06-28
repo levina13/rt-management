@@ -2,27 +2,22 @@ import { ErrorAlert } from "@/components/error-alert"
 import ContractForm from "@/components/forms/contract-form"
 import DynamicBreadcrumb from "@/components/breadcrumb"
 import Layout from "@/components/Layout"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { api } from "@/lib/axios"
-import { Edit, MessageCircleMoreIcon, PlusSquare } from "lucide-react"
+import { PlusSquare } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
+import DataTable from "@/components/data-table"
+import { ResidentHistoryColumn } from "@/lib/column"
+import type { Search } from "@/lib/type"
+import { Input } from "@/components/ui/input"
 
 export default function ResidentHistory() {
   const { houseId } = useParams<{ houseId: string }>()
   const [residents, setResidents] = useState([])
   const [disabled, setDisabled] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
+  const [search, setSearch] = useState<Search>()
 
   function fetchResidents() {
     api
@@ -61,68 +56,19 @@ export default function ResidentHistory() {
             </ErrorAlert>
           )}
           <div className="mt-4">
-            <Table>
-              <TableCaption>Daftar penghuni rumah ...</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[30px]">No.</TableHead>
-                  <TableHead>Nama</TableHead>
-                  <TableHead>Status </TableHead>
-                  <TableHead>Tanggal Mulai</TableHead>
-                  <TableHead>Tanggal Berakhir</TableHead>
-                  <TableHead className="text-center">Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {residents.map((resident, index) => (
-                  <TableRow key={resident["id"]}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>
-                      <div className="flex justify-between">
-                        <div>{resident["name"]}</div>
-                        <div>
-                          <Button variant={"outline"} asChild>
-                            <a
-                              href={`https://wa.me/62${String(
-                                resident["phone"]
-                              ).substring(1)}`}
-                              target="blank"
-                            >
-                              <MessageCircleMoreIcon />
-                            </a>
-                          </Button>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {resident["category"] == "permanen" ? (
-                        <Badge variant={"default"}>
-                          {resident["category"]}
-                        </Badge>
-                      ) : (
-                        <Badge variant={"outline"}>
-                          {resident["category"]}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>{resident["start_date"]}</TableCell>
-                    <TableCell>{resident["end_date"] ?? "-"}</TableCell>
-                    <TableCell className="">
-                      <div className="flex justify-center gap-2">
-                        <ContractForm
-                          onSuccess={fetchResidents}
-                          id={resident["contract_id"]}
-                        >
-                          <Button variant={"default"}>
-                            <Edit /> Edit
-                          </Button>
-                        </ContractForm>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <Input
+              placeholder="Cari Penghuni..."
+              value={search?.value}
+              onChange={(event) =>
+                setSearch({ label: "name", value: event.target.value })
+              }
+              className="max-w-sm mb-2"
+            />
+            <DataTable
+              data={residents}
+              columns={ResidentHistoryColumn}
+              search={search}
+            />
           </div>
         </div>
       </Layout>

@@ -1,27 +1,20 @@
 import ExpenseForm from "@/components/forms/expense-form"
 import Layout from "@/components/Layout"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { api } from "@/lib/axios"
 import { PlusSquare } from "lucide-react"
 import { useEffect, useState } from "react"
-import type { ExpenseHistoryTable } from "./management/type"
-import { rupiah } from "@/lib/utils"
+import { type Search } from "../lib/type"
 import { ErrorAlert } from "@/components/error-alert"
 import DynamicBreadcrumb from "@/components/breadcrumb"
+import { Input } from "@/components/ui/input"
+import DataTable from "@/components/data-table"
+import { ExpenseColumn } from "@/lib/column"
 
 export default function Expense() {
   const [expenses, setExpenses] = useState([])
   const [errors, setErrors] = useState<string[]>([])
+  const [search, setSearch] = useState<Search>()
 
   function fetchExpenses() {
     api
@@ -56,31 +49,19 @@ export default function Expense() {
             </ErrorAlert>
           )}
           <div className="mt-5">
-            <Table>
-              <TableCaption>Daftar Pengeluaran di RT..</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[30px]">No.</TableHead>
-                  <TableHead>Jenis Pengeluaran</TableHead>
-                  <TableHead>Deskripsi</TableHead>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Jumlah</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {expenses.map((expense: ExpenseHistoryTable, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{index + 1}</TableCell>
-                    <TableCell>
-                      <Badge>{expense.expense_category}</Badge>
-                    </TableCell>
-                    <TableCell>{expense.desc}</TableCell>
-                    <TableCell>{expense.date}</TableCell>
-                    <TableCell>{rupiah(expense.amount)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <Input
+              placeholder="Cari Pengeluaran..."
+              value={search?.value}
+              onChange={(event) =>
+                setSearch({ label: "desc", value: event.target.value })
+              }
+              className="max-w-sm mb-2"
+            />
+            <DataTable
+              columns={ExpenseColumn}
+              data={expenses}
+              search={search}
+            />
           </div>
         </div>
       </Layout>
